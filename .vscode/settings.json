@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "__bit_reference": "cpp",
+    "ostream": "cpp",
+    "regex": "cpp",
+    "any": "cpp",
+    "future": "cpp",
+    "type_traits": "cpp",
+    "__mutex_base": "cpp",
+    "shared_mutex": "cpp",
+    "*.inc": "cpp"
+  }
+}
