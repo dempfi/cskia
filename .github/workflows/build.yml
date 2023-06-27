@@ -13,15 +13,15 @@ on:
         default: 'false'
 
 env:
-  version: m110-d88a7b5
+  version: m115-3e827ba
 
 jobs:
   macos:
     runs-on: ${{ fromJson('{"macos":"macos-11","ios":"macos-11","iosSim":"macos-11","tvos":"macos-13","tvosSim":"macos-13"}')[matrix.target] }}
     strategy:
       matrix:
-        target: ["macos"]
-        machine: ["arm64"]
+        target: ['macos']
+        machine: ['arm64', 'x64']
         build_type: [Release]
         exclude:
           - target: tvos

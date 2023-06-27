@@ -71,6 +71,13 @@ typedef struct
   int32_t y;
 } sk_ipoint_t;
 
+typedef struct
+{
+  float x;
+  float y;
+  float z;
+} sk_point3_t;
+
 typedef sk_point_t sk_vector_t;
 
 typedef struct
@@ -116,6 +123,21 @@ typedef enum
   ROUND_SK_STROKE_JOIN,
   BEVEL_SK_STROKE_JOIN
 } sk_stroke_join_t;
+
+typedef enum
+{
+  TRANSLATE_SK_PATH_EFFECT_1D_STYLE,
+  ROTATE_SK_PATH_EFFECT_1D_STYLE,
+  MORPH_SK_PATH_EFFECT_1D_STYLE,
+} sk_path_effect_1d_style_t;
+
+typedef enum
+{
+  NORMAL_SK_PATH_EFFECT_TRIM_MODE,
+  INVERTED_SK_PATH_EFFECT_TRIM_MODE,
+} sk_path_effect_trim_mode_t;
+
+typedef struct sk_path_effect_t sk_path_effect_t;
 
 typedef enum
 {
@@ -187,6 +209,22 @@ typedef struct sk_rrect_t sk_rrect_t;
 typedef struct sk_canvas_t sk_canvas_t;
 
 // Paint
+typedef enum
+{
+  NO_SHADOW_FLAG = 0x00,
+  /** The occluding object is not opaque. Knowing that the occluder is opaque allows
+   * us to cull shadow geometry behind it and improve performance. */
+  TRANSPARENT_OCCLUDER_SHADOW_FLAG = 0x01,
+  /** Don't try to use analytic shadows. */
+  GEOMETRIC_ONLY_SHADOW_FLAG = 0x02,
+  /** Light position represents a direction, light radius is blur radius at elevation 1 */
+  DIRECTIONAL_LIGHT_SHADOW_FLAG = 0x04,
+  /** Concave paths will only use blur to generate the shadow */
+  CONCAVE_BLUR_ONLY_SHADOW_FLAG = 0x08,
+  /** mask for all shadow flags */
+  ALL_SHADOW_FLAG = 0x0F
+} sk_shadow_flags_t;
+
 typedef struct sk_paint_t sk_paint_t;
 
 // Path
@@ -243,11 +281,11 @@ typedef enum
 
 typedef struct
 {
-  sk_colorspace_t *colorspace;
   int32_t width;
   int32_t height;
-  sk_colortype_t colorType;
-  sk_alphatype_t alphaType;
+  sk_colortype_t color_type;
+  sk_alphatype_t alpha_type;
+  sk_colorspace_t *color_space;
 } sk_imageinfo_t;
 
 typedef enum
@@ -264,6 +302,22 @@ typedef enum
   HIGH_SK_FILTER_QUALITY
 } sk_filter_quality_t;
 
+typedef enum
+{
+  BMP_SK_ENCODED_FORMAT,
+  GIF_SK_ENCODED_FORMAT,
+  ICO_SK_ENCODED_FORMAT,
+  JPEG_SK_ENCODED_FORMAT,
+  PNG_SK_ENCODED_FORMAT,
+  WBMP_SK_ENCODED_FORMAT,
+  WEBP_SK_ENCODED_FORMAT,
+  PKM_SK_ENCODED_FORMAT,
+  KTX_SK_ENCODED_FORMAT,
+  ASTC_SK_ENCODED_FORMAT,
+  DNG_SK_ENCODED_FORMAT,
+  HEIF_SK_ENCODED_FORMAT,
+} sk_encoded_image_format_t;
+
 typedef struct sk_pixmap_t sk_pixmap_t;
 
 typedef struct sk_imagefilter_t sk_imagefilter_t;
@@ -272,8 +326,8 @@ typedef struct sk_image_t sk_image_t;
 
 typedef enum
 {
-  SRC_RECT_CONSTRAINT_STRICT, // Sample only inside bounds; slower
-  SRC_RECT_CONSTRAINT_FAST,   // Sample outside bounds; faster
+  STRICT_SRC_RECT_CONSTRAINT, // Sample only inside bounds; slower
+  FAST_SRC_RECT_CONSTRAINT,   // Sample outside bounds; faster
 } sk_src_rect_constraint_t;
 
 typedef struct
@@ -284,17 +338,17 @@ typedef struct
 
 typedef enum
 {
-  SK_FILTER_MODE_NEAREST,
-  SK_FILTER_MODE_LINEAR,
-  SK_FILTER_MODE_LAST = SK_FILTER_MODE_LINEAR,
+  NEAREST_SK_FILTER_MODE,
+  LINEAR_SK_FILTER_MODE,
+  LAST_SK_FILTER_MODE = LINEAR_SK_FILTER_MODE,
 } sk_filter_mode_t;
 
 typedef enum
 {
-  SK_MIPMAP_MODE_NONE,
-  SK_MIPMAP_MODE_NEAREST,
-  SK_MIPMAP_MODE_LINEAR,
-  SK_MIPMAP_MODE_LAST = SK_MIPMAP_MODE_LINEAR,
+  NONE_SK_MIPMAP_MODE,
+  NEAREST_SK_MIPMAP_MODE,
+  LINEAR_SK_MIPMAP_MODE,
+  LAST_SK_MIPMAP_MODE = LINEAR_SK_MIPMAP_MODE,
 } sk_mipmap_mode_t;
 
 typedef struct
@@ -309,10 +363,10 @@ typedef struct
 // Text
 typedef enum
 {
-  SK_TEXT_ENCODING_UTF8,     // uses bytes to represent UTF-8 or ASCII
-  SK_TEXT_ENCODING_UTF16,    // uses two byte words to represent most of Unicode
-  SK_TEXT_ENCODING_UTF32,    // uses four byte words to represent all of Unicode
-  SK_TEXT_ENCODING_GLYPH_ID, // uses two byte words to represent glyph indices
+  UTF8_SK_TEXT_ENCODING,     // uses bytes to represent UTF-8 or ASCII
+  UTF16_SK_TEXT_ENCODING,    // uses two byte words to represent most of Unicode
+  UTF32_SK_TEXT_ENCODING,    // uses four byte words to represent all of Unicode
+  GLYPH_ID_SK_TEXT_ENCODING, // uses two byte words to represent glyph indices
 } sk_text_encoding_t;
 
 typedef struct sk_textblob_t sk_textblob_t;
@@ -383,11 +437,36 @@ typedef struct sk_font_t sk_font_t;
 typedef struct sk_typeface_t sk_typeface_t;
 typedef uint32_t sk_font_table_tag_t;
 typedef struct sk_fontmgr_t sk_fontmgr_t;
-typedef struct sk_fontstyle_t sk_fontstyle_t;
 typedef struct sk_fontstyleset_t sk_fontstyleset_t;
+
+typedef enum
+{
+  UPRIGHT_SK_FONTSLANT,
+  ITALIC_SK_FONTSLANT,
+  OBLIQUE_SK_FONTSLANT,
+} sk_fontslant_t;
+
+typedef struct
+{
+  int32_t weight;
+  int32_t width;
+  sk_fontslant_t slant;
+} sk_fontstyle_t;
+
+/**
+    A sk_data_ holds an immutable data buffer.
+*/
+typedef struct sk_data_t sk_data_t;
 
 ////////////////////////////////////////////////
 //////////////////// GPU ///////////////////////
+typedef struct
+{
+  const void *fDevice;
+  const void *fQueue;
+  const void *fBinaryArchive;
+} gr_mtl_backend_context_t;
+
 typedef struct gr_direct_context_t gr_direct_context_t;
 
 typedef struct gr_backendrendertarget_t gr_backendrendertarget_t;
@@ -396,6 +475,121 @@ typedef struct
 {
   const void *fTexture;
 } gr_mtl_textureinfo_t;
+
+////////////////////////////////////////////////
+///////////////// PARAGRAPH ////////////////////
+typedef struct sk_paragraph_t sk_paragraph_t;
+typedef struct sk_paragraphbuilder_t sk_paragraphbuilder_t;
+typedef struct sk_paragraphstyle_t sk_paragraphstyle_t;
+typedef struct sk_textstyle_t sk_textstyle_t;
+typedef struct sk_strutstyle_t sk_strutstyle_t;
+
+typedef enum
+{
+  UPSTREAM_SK_AFFINITY,
+  DOWNSTREAM_SK_AFFINITY,
+} sk_affinity_t;
+
+typedef struct
+{
+  int32_t position;
+  sk_affinity_t affinity;
+} sk_positionaffinity_t;
+
+typedef struct
+{
+  size_t start_index;
+  size_t end_index;
+  size_t end_excluding_whitespaces;
+  size_t end_including_newline;
+  bool is_hard_break;
+  double ascent;
+  double descent;
+  double height;
+  double width;
+  double left;
+  double baseline;
+  size_t line_number;
+} sk_metrics_t;
+
+typedef enum
+{
+  RIGHT_TO_LEFT_SK_TEXTDIRECTION,
+  LEFT_TO_RIGHT_SK_TEXTDIRECTION,
+} sk_textdirection_t;
+
+typedef struct
+{
+  sk_rect_t rect;
+  sk_textdirection_t direction;
+} sk_textbox_t;
+
+typedef enum
+{
+  TIGHT_SK_RECTHEIGHTSTYLE,
+  MAX_SK_RECTHEIGHTSTYLE,
+  INCLUDE_LINE_SPACING_MIDDLE_SK_RECTHEIGHTSTYLE,
+  INCLUDE_LINE_SPACING_TOP_SK_RECTHEIGHTSTYLE,
+  INCLUDE_LINE_SPACING_BOTTOM_SK_RECTHEIGHTSTYLE,
+  STRUT_SK_RECTHEIGHTSTYLE,
+} sk_rectheightstyle_t;
+
+typedef enum
+{
+  TIGHT_SK_RECTWIDTHSTYLE,
+  MAX_SK_RECTWIDTHSTYLE,
+} sk_rectwidthstyle_t;
+
+typedef enum
+{
+  BASELINE_SK_PLACEHOLDERALIGNMENT,
+  ABOVE_BASELINE_SK_PLACEHOLDERALIGNMENT,
+  BELOW_BASELINE_SK_PLACEHOLDERALIGNMENT,
+  TOP_SK_PLACEHOLDERALIGNMENT,
+  BOTTOM_SK_PLACEHOLDERALIGNMENT,
+  MIDDLE_SK_PLACEHOLDERALIGNMENT,
+} sk_placeholderalignment_t;
+
+typedef enum
+{
+  ALPHABETIC_SK_TEXTBASELINE,
+  IDEOGRAPHIC_SK_TEXTBASELINE,
+} sk_textbaseline_t;
+
+typedef struct
+{
+  float width;
+  float height;
+  sk_placeholderalignment_t alignment;
+  sk_textbaseline_t baseline;
+  float baseline_offset;
+} sk_placeholderstyle_t;
+
+typedef enum
+{
+  LEFT_SK_TEXTALIGN,
+  RIGHT_SK_TEXTALIGN,
+  CENTER_SK_TEXTALIGN,
+  JUSTIFY_SK_TEXTALIGN,
+  START_SK_TEXTALIGN,
+  TERMINATE_SK_TEXTALIGN,
+} sk_textalign_t;
+
+typedef struct
+{
+  sk_color_t color;
+  sk_point_t offset;
+  double blur_radius;
+} sk_textshadow_t;
+
+typedef enum
+{
+  SOLID_SK_TEXTDECORATIONSTYLE,
+  DOUBLE_SK_TEXTDECORATIONSTYLE,
+  DOTTED_SK_TEXTDECORATIONSTYLE,
+  DASHED_SK_TEXTDECORATIONSTYLE,
+  WAVY_SK_TEXTDECORATIONSTYLE,
+} sk_textdecorationstyle_t;
 
 SK_C_PLUS_PLUS_END_GUARD
 #endif

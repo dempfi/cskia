@@ -24,6 +24,8 @@ SK_C_API sk_stroke_join_t sk_paint_get_stroke_join(const sk_paint_t *paint);
 SK_C_API void sk_paint_set_stroke_join(sk_paint_t *paint, sk_stroke_join_t);
 SK_C_API bool sk_paint_is_dither(const sk_paint_t *paint);
 SK_C_API void sk_paint_set_dither(sk_paint_t *paint, bool);
+void sk_paint_set_path_effect(sk_paint_t *paint, sk_path_effect_t *effect);
+sk_path_effect_t *sk_paint_get_path_effect(sk_paint_t *paint);
 
 SK_C_PLUS_PLUS_END_GUARD
 #endif

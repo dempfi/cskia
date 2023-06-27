@@ -17,3 +17,13 @@ void sk_surface_unref(sk_surface_t *surface)
 {
   SkSafeUnref(reinterpret_cast<SkSurface *>(surface));
 };
+
+float sk_surface_get_width(sk_surface_t *surface)
+{
+  return reinterpret_cast<SkSurface *>(surface)->width();
+};
+
+float sk_surface_get_height(sk_surface_t *surface)
+{
+  return reinterpret_cast<SkSurface *>(surface)->height();
+};

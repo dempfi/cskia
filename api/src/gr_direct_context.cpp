@@ -1,10 +1,11 @@
 #include "include/gr_direct_context.h"
 #include "include/gpu/GrDirectContext.h"
+#include "include/gpu/mtl/GrMtlBackendContext.h"
 
 #ifdef SK_METAL
-gr_direct_context_t *gr_direct_context_make_metal(void *device, void *queue)
+gr_direct_context_t *gr_direct_context_make_metal(const gr_mtl_backend_context_t *backendContext)
 {
-  return reinterpret_cast<gr_direct_context_t *>(GrDirectContext::MakeMetal(device, queue).release());
+  return reinterpret_cast<gr_direct_context_t *>(GrDirectContext::MakeMetal(*reinterpret_cast<const GrMtlBackendContext *>(backendContext)).release());
 };
 #endif
 
