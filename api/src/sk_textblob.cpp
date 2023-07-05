@@ -1,29 +1,44 @@
 #include "include/sk_textblob.h"
-#include "include/core/SkTextBlob.h"
+#include "sk_mapping.h"
 
-void sk_textblob_ref(const sk_textblob_t *blob)
+int32_t sk_textblob_get_intercepts(const sk_textblob_t *self, const float bounds[2], float result[], const sk_paint_t *paint)
 {
-  SkSafeRef(reinterpret_cast<const SkTextBlob *>(blob));
-};
+  return AsTextBlob(self)->getIntercepts(bounds, result, AsPaint(paint));
+}
 
-void sk_textblob_unref(const sk_textblob_t *blob)
+sk_textblob_t *sk_textblob_make_from_text(const void *text, size_t size, const sk_font_t *font, sk_textencoding_t encoding)
 {
-  SkSafeUnref(reinterpret_cast<const SkTextBlob *>(blob));
-};
+  return ToTextBlob(SkTextBlob::MakeFromText(text, size, AsFont(*font), AsTextEncoding(encoding)).release());
+}
 
-uint32_t sk_textblob_get_unique_id(const sk_textblob_t *blob)
+sk_textblob_t *sk_textblob_make_from_text_horizontally_positioned(const void *text, size_t size, const float x_positions[], float y, const sk_font_t *font, sk_textencoding_t encoding)
 {
-  return reinterpret_cast<const SkTextBlob *>(blob)->uniqueID();
-};
+  return ToTextBlob(SkTextBlob::MakeFromPosTextH(text, size, x_positions, y, AsFont(*font), AsTextEncoding(encoding)).release());
+}
+
+sk_textblob_t *sk_textblob_make_from_text_positioned(const void *text, size_t size, const sk_point_t positions[], const sk_font_t *font, sk_textencoding_t encoding)
+{
+  return ToTextBlob(SkTextBlob::MakeFromPosText(text, size, AsPoint(positions), AsFont(*font), AsTextEncoding(encoding)).release());
+}
+
+sk_textblob_t *sk_textblob_make_from_text_transform(const void *text, size_t size, const sk_rotationscalematrix_t matrices[], const sk_font_t *font, sk_textencoding_t encoding)
+{
+  return ToTextBlob(SkTextBlob::MakeFromRSXform(text, size, AsRotationScaleMatrix(matrices), AsFont(*font), AsTextEncoding(encoding)).release());
+}
+
+void sk_textblob_ref(const sk_textblob_t *self)
+{
+  AsTextBlob(self)->ref();
+}
+
+void sk_textblob_unref(const sk_textblob_t *self)
+{
+  AsTextBlob(self)->unref();
+}
 
 void sk_textblob_get_bounds(const sk_textblob_t *blob, sk_rect_t *bounds)
 {
   *bounds = reinterpret_cast<const sk_rect_t &>(reinterpret_cast<const SkTextBlob *>(blob)->bounds());
-};
-
-int sk_textblob_get_intercepts(const sk_textblob_t *blob, const float bounds[2], float intervals[], const sk_paint_t *paint)
-{
-  return reinterpret_cast<const SkTextBlob *>(blob)->getIntercepts(bounds, intervals, reinterpret_cast<const SkPaint *>(paint));
 };
 
 // sk_textblob_builder_t

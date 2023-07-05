@@ -15,10 +15,14 @@
 #define SK_C_PLUS_PLUS_END_GUARD
 #endif
 
-#if !defined(SK_C_API)
-#if defined(SKIA_C_DLL)
-#if defined(_MSC_VER)
-#if SKIA_IMPLEMENTATION
+#ifndef SK_IMPLEMENTATION
+#define SK_IMPLEMENTATION 0
+#endif
+
+#ifndef SK_C_API
+#ifdef SK_DLL
+#ifdef _WIN32
+#if SK_IMPLEMENTATION
 #define SK_C_API __declspec(dllexport)
 #else
 #define SK_C_API __declspec(dllimport)
@@ -31,184 +35,294 @@
 #endif
 #endif
 
-#if defined(_WIN32)
-// On Windows, Vulkan commands use the stdcall convention
-#define VKAPI_ATTR
-#define VKAPI_CALL __stdcall
-#define VKAPI_PTR VKAPI_CALL
-#elif defined(__ANDROID__) && defined(__ARM_ARCH) && __ARM_ARCH < 7
-#error "Vulkan isn't supported for the 'armeabi' NDK ABI"
-#elif defined(__ANDROID__) && defined(__ARM_ARCH) && __ARM_ARCH >= 7 && defined(__ARM_32BIT_STATE)
-// On Android 32-bit ARM targets, Vulkan functions use the "hardfloat"
-// calling convention, i.e. float parameters are passed in registers. This
-// is true even if the rest of the application passes floats on the stack,
-// as it does by default when compiling for the armeabi-v7a NDK ABI.
-#define VKAPI_ATTR __attribute__((pcs("aapcs-vfp")))
-#define VKAPI_CALL
-#define VKAPI_PTR VKAPI_ATTR
-#else
-// On other platforms, use the default calling convention
-#define VKAPI_ATTR
-#define VKAPI_CALL
-#define VKAPI_PTR
-#endif
+////////////////////////////////////////////////////////////////////////////////
 
 SK_C_PLUS_PLUS_BEGIN_GUARD
 
-// Primitives
-typedef struct sk_string_t sk_string_t;
-typedef uint32_t sk_color_t;
-
-typedef struct
-{
-  float x;
-  float y;
-} sk_point_t;
-
-typedef struct
-{
-  int32_t x;
-  int32_t y;
-} sk_ipoint_t;
-
-typedef struct
-{
-  float x;
-  float y;
-  float z;
-} sk_point3_t;
-
-typedef sk_point_t sk_vector_t;
-
-typedef struct
-{
-  int32_t left;
-  int32_t top;
-  int32_t right;
-  int32_t bottom;
-} sk_irect_t;
-
-typedef struct
-{
-  float left;
-  float top;
-  float right;
-  float bottom;
-} sk_rect_t;
-
-typedef struct
-{
-  float scaleX, skewX, transX;
-  float skewY, scaleY, transY;
-  float persp0, persp1, persp2;
-} sk_matrix_t;
-
-typedef enum
-{
-  FILL_SK_PAINT_STYLE,
-  STROKE_SK_PAINT_STYLE,
-  STROKE_AND_FILL_SK_PAINT_STYLE,
-} sk_paint_style_t;
-
-typedef enum
-{
-  BUTT_SK_STROKE_CAP,
-  ROUND_SK_STROKE_CAP,
-  SQUARE_SK_STROKE_CAP
-} sk_stroke_cap_t;
-
-typedef enum
-{
-  MITER_SK_STROKE_JOIN,
-  ROUND_SK_STROKE_JOIN,
-  BEVEL_SK_STROKE_JOIN
-} sk_stroke_join_t;
-
-typedef enum
-{
-  TRANSLATE_SK_PATH_EFFECT_1D_STYLE,
-  ROTATE_SK_PATH_EFFECT_1D_STYLE,
-  MORPH_SK_PATH_EFFECT_1D_STYLE,
-} sk_path_effect_1d_style_t;
-
-typedef enum
-{
-  NORMAL_SK_PATH_EFFECT_TRIM_MODE,
-  INVERTED_SK_PATH_EFFECT_TRIM_MODE,
-} sk_path_effect_trim_mode_t;
-
-typedef struct sk_path_effect_t sk_path_effect_t;
-
-typedef enum
-{
-  SMALL_SK_PATH_ARC_SIZE,
-  LARGE_SK_PATH_ARC_SIZE,
-} sk_path_arc_size_t;
-
-typedef enum
-{
-  CW_SK_PATH_DIRECTION,
-  CCW_SK_PATH_DIRECTION,
-} sk_path_direction_t;
-
-typedef enum
-{
-  WINDING_SK_PATH_FILLTYPE,
-  EVENODD_SK_PATH_FILLTYPE,
-  INVERSE_WINDING_SK_PATH_FILLTYPE,
-  INVERSE_EVENODD_SK_PATH_FILLTYPE,
-} sk_path_filltype_t;
-
-typedef enum
-{
-  APPEND_SK_PATH_ADD_MODE,
-  EXTEND_SK_PATH_ADD_MODE,
-} sk_path_add_mode_t;
-
-typedef enum
-{
-  DIFFERENCE_SK_PATHOP,
-  INTERSECT_SK_PATHOP,
-  UNION_SK_PATHOP,
-  XOR_SK_PATHOP,
-  REVERSE_DIFFERENCE_SK_PATHOP,
-} sk_pathop_t;
-
-typedef struct sk_opbuilder_t sk_opbuilder_t;
-typedef struct sk_pathmeasure_t sk_pathmeasure_t;
-
-typedef enum
-{
-  GET_POSITION_SK_PATHMEASURE_MATRIXFLAGS = 0x01,
-  GET_TANGENT_SK_PATHMEASURE_MATRIXFLAGS = 0x02,
-  GET_POS_AND_TAN_SK_PATHMEASURE_MATRIXFLAGS = GET_POSITION_SK_PATHMEASURE_MATRIXFLAGS | GET_TANGENT_SK_PATHMEASURE_MATRIXFLAGS,
-} sk_pathmeasure_matrixflags_t;
-
-typedef enum
-{
-  EMPTY_SK_RRECT_TYPE,
-  RECT_SK_RRECT_TYPE,
-  OVAL_SK_RRECT_TYPE,
-  SIMPLE_SK_RRECT_TYPE,
-  NINE_PATCH_SK_RRECT_TYPE,
-  COMPLEX_SK_RRECT_TYPE,
-} sk_rrect_type_t;
-
-typedef enum
-{
-  UPPER_LEFT_SK_RRECT_CORNER,
-  UPPER_RIGHT_SK_RRECT_CORNER,
-  LOWER_RIGHT_SK_RRECT_CORNER,
-  LOWER_LEFT_SK_RRECT_CORNER,
-} sk_rrect_corner_t;
-
-// Rounded rectangle
-typedef struct sk_rrect_t sk_rrect_t;
-
-// Canvas
+typedef struct sk_animcodecplayer_t sk_animcodecplayer_t;
+typedef struct sk_blender_t sk_blender_t;
 typedef struct sk_canvas_t sk_canvas_t;
+typedef struct sk_codec_t sk_codec_t;
+typedef struct sk_colorfilter_t sk_colorfilter_t;
+typedef struct sk_colorspace_t sk_colorspace_t;
+typedef struct sk_colorspaceiccprofile_t sk_colorspaceiccprofile_t;
+typedef struct sk_data_t sk_data_t;
+typedef struct sk_document_t sk_document_t;
+typedef struct sk_flattenable_t sk_flattenable_t;
+typedef struct sk_font_t sk_font_t;
+typedef struct sk_fontmgr_t sk_fontmgr_t;
+typedef struct sk_image_t sk_image_t;
+typedef struct sk_imagefilter_t sk_imagefilter_t;
+typedef struct sk_maskfilter_t sk_maskfilter_t;
+typedef struct sk_opbuilder_t sk_opbuilder_t;
+typedef struct sk_paint_t sk_paint_t;
+typedef struct sk_path_t sk_path_t;
+typedef struct sk_pathbuilder_t sk_pathbuilder_t;
+typedef struct sk_patheffect_t sk_patheffect_t;
+typedef struct sk_pathiterator_t sk_pathiterator_t;
+typedef struct sk_pathmeasure_t sk_pathmeasure_t;
+typedef struct sk_pathrawiter_t sk_pathrawiter_t;
+typedef struct sk_picture_t sk_picture_t;
+typedef struct sk_picturerecorder_t sk_picturerecorder_t;
+typedef struct sk_pixmap_t sk_pixmap_t;
+typedef struct sk_refcnt_t sk_refcnt_t;
+typedef struct sk_region_t sk_region_t;
+typedef struct sk_regioncliperator_t sk_regioncliperator_t;
+typedef struct sk_regioniterator_t sk_regioniterator_t;
+typedef struct sk_regionspanerator_t sk_regionspanerator_t;
+typedef struct sk_rrect_t sk_rrect_t;
+typedef struct sk_runtimeblendbuilder_t sk_runtimeblendbuilder_t;
+typedef struct sk_runtimeeffect_t sk_runtimeeffect_t;
+typedef struct sk_runtimeeffectbuilder_t sk_runtimeeffectbuilder_t;
+typedef struct sk_runtimeshaderbuilder_t sk_runtimeshaderbuilder_t;
+typedef struct sk_shader_t sk_shader_t;
+typedef struct sk_stream_t sk_stream_t;
+typedef struct sk_streamadapter_t sk_streamadapter_t;
+typedef struct sk_string_t sk_string_t;
+typedef struct sk_surface_t sk_surface_t;
+typedef struct sk_textblob_t sk_textblob_t;
+typedef struct sk_textblob_builder_t sk_textblob_builder_t;
+typedef struct sk_tracememorydump_t sk_tracememorydump_t;
+typedef struct sk_tracememorydumpbaseclass_t sk_tracememorydumpbaseclass_t;
+typedef struct sk_typeface_t sk_typeface_t;
+typedef struct sk_vertices_t sk_vertices_t;
+typedef struct sk_wstream_t sk_wstream_t;
+typedef struct sk_wstreamadapter_t sk_wstreamadapter_t;
 
-// Paint
+#define INIT_WITH_PREVIOUS_SK_SAVE_LAYER_FLAG (1 << 2)
+#define F16_COLOR_TYPE_SK_SAVE_LAYER_FLAG (1 << 4)
+
+#define UNDERLINE_THICKNESS_IS_VALID_SK_FONT_METRICS_FLAG (1 << 0)
+#define UNDERLINE_POSITION_IS_VALID_SK_FONT_METRICS_FLAG (1 << 1)
+#define STRIKEOUT_THICKNESS_IS_VALID_SK_FONT_METRICS_FLAG (1 << 2)
+#define STRIKEOUT_POSITION_IS_VALID_SK_FONT_METRICS_FLAG (1 << 3)
+#define BOUNDS_INVALID_SK_FONT_METRICS_FLAG (1 << 4)
+
+#define GET_POSITION_SK_PATH_MEASURE_MATRIX_FLAG (1 << 0)
+#define GET_TANGENT_SK_PATH_MEASURE_MATRIX_FLAG (1 << 1)
+
+#define LINE_SK_PATH_SEGMENT_MASK (1 << 0)
+#define QUAD_SK_PATH_SEGMENT_MASK (1 << 1)
+#define CONIC_SK_PATH_SEGMENT_MASK (1 << 2)
+#define CUBIC_SK_PATH_SEGMENT_MASK (1 << 3)
+
+#define USE_DEVICE_INDEPENDENT_FONTS_SK_SURFACE_PROPS_FLAG (1 << 0)
+#define DYNAMIC_MSAA_SK_SURFACE_PROPS_FLAG (1 << 1)
+
+#define CONVERT_TEXT_TO_PATHS_SK_SVG_CANVAS_FLAG (1 << 0)
+#define NO_PRETTY_XML_SK_SVG_CANVAS_FLAG (1 << 1)
+#define RELATIVE_PATH_ENCODING_SK_SVG_CANVAS_FLAG (1 << 2)
+
+typedef enum
+{
+  UNKNOWN_SK_ALPHATYPE,
+  OPAQUE_SK_ALPHATYPE,
+  PREMUL_SK_ALPHATYPE,
+  UNPREMUL_SK_ALPHATYPE,
+} sk_alphatype_t;
+
+typedef enum
+{
+  CLEAR_SK_BLENDMODE,
+  SRC_SK_BLENDMODE,
+  DEST_SK_BLENDMODE,
+  SRC_OVER_SK_BLENDMODE,
+  DEST_OVER_SK_BLENDMODE,
+  SRC_IN_SK_BLENDMODE,
+  DEST_IN_SK_BLENDMODE,
+  SRC_OUT_SK_BLENDMODE,
+  DEST_OUT_SK_BLENDMODE,
+  SRC_A_TOP_SK_BLENDMODE,
+  DEST_A_TOP_SK_BLENDMODE,
+  XOR_SK_BLENDMODE,
+  PLUS_SK_BLENDMODE,
+  MODULATE_SK_BLENDMODE,
+  SCREEN_SK_BLENDMODE,
+  OVERLAY_SK_BLENDMODE,
+  DARKEN_SK_BLENDMODE,
+  LIGHTEN_SK_BLENDMODE,
+  COLOR_DODGE_SK_BLENDMODE,
+  COLOR_BURN_SK_BLENDMODE,
+  HARD_LIGHT_SK_BLENDMODE,
+  SOFT_LIGHT_SK_BLENDMODE,
+  DIFFERENCE_SK_BLENDMODE,
+  EXCLUSION_SK_BLENDMODE,
+  MULTIPLY_SK_BLENDMODE,
+  HUE_SK_BLENDMODE,
+  SATURATION_SK_BLENDMODE,
+  COLOR_SK_BLENDMODE,
+  LUMINOSITY_SK_BLENDMODE,
+} sk_blendmode_t;
+
+typedef enum
+{
+  NORMAL_SK_BLURSTYLE,
+  SOLID_SK_BLURSTYLE,
+  OUTER_SK_BLURSTYLE,
+  INNER_SK_BLURSTYLE,
+} sk_blurstyle_t;
+
+typedef enum
+{
+  DIFFERENCE_SK_CLIPOP,
+  INTERSECT_SK_CLIPOP,
+} sk_clipop_t;
+
+typedef enum
+{
+  R_SK_COLORCHANNEL,
+  G_SK_COLORCHANNEL,
+  B_SK_COLORCHANNEL,
+  A_SK_COLORCHANNEL,
+} sk_colorchannel_t;
+
+typedef enum
+{
+  UNKNOWN_SK_COLORTYPE,
+  ALPHA8_SK_COLORTYPE,
+  RGB565_SK_COLORTYPE,
+  ARGB4444_SK_COLORTYPE,
+  RGBA8888_SK_COLORTYPE,
+  RGB888X_SK_COLORTYPE,
+  BGRA8888_SK_COLORTYPE,
+  RGBA1010102_SK_COLORTYPE,
+  BGRA1010102_SK_COLORTYPE,
+  RGB101010X_SK_COLORTYPE,
+  BGR101010X_SK_COLORTYPE,
+  BGR101010X_XR_COLORTYPE,
+  GRAY8_SK_COLORTYPE,
+  RGBAF16_SK_COLORTYPE,
+  RGBAF16CLAMPED_SK_COLORTYPE,
+  RGBAF32_SK_COLORTYPE,
+  RG88_SK_COLORTYPE,
+  ALPHAF16_SK_COLORTYPE,
+  RGF16_SK_COLORTYPE,
+  ALPHA16_SK_COLORTYPE,
+  RG1616_SK_COLORTYPE,
+  RGBA16161616_SK_COLORTYPE,
+  SRGBA8888_SK_COLORTYPE,
+  R8_SK_COLORTYPE,
+} sk_colortype_t;
+
+typedef enum
+{
+  POINTS_SK_DRAWPOINTSMODE,
+  LINES_SK_DRAWPOINTSMODE,
+  POLYGON_DRAWPOINTSMODE,
+} sk_drawpointsmode_t;
+
+typedef enum
+{
+  BMP_SK_ENCODEDIMAGEFORMAT,
+  GIF_SK_ENCODEDIMAGEFORMAT,
+  ICO_SK_ENCODEDIMAGEFORMAT,
+  JPEG_SK_ENCODEDIMAGEFORMAT,
+  PNG_SK_ENCODEDIMAGEFORMAT,
+  WBMP_SK_ENCODEDIMAGEFORMAT,
+  WEBP_SK_ENCODEDIMAGEFORMAT,
+  PKM_SK_ENCODEDIMAGEFORMAT,
+  KTX_SK_ENCODEDIMAGEFORMAT,
+  ASTC_SK_ENCODEDIMAGEFORMAT,
+  DNG_SK_ENCODEDIMAGEFORMAT,
+  HEIF_SK_ENCODEDIMAGEFORMAT,
+  AVIF_SK_ENCODEDIMAGEFORMAT,
+} sk_encodedimageformat_t;
+
+typedef enum
+{
+  NEAREST_SK_FILTERMODE,
+  LINEAR_SK_FILTERMODE,
+} sk_filtermode_t;
+
+typedef enum
+{
+  ALIAS_SK_FONTEDGING,
+  ANTI_ALIAS_SK_FONTEDGING,
+  SUBPIXEL_ANTI_ALIAS_SK_FONTEDGING,
+} sk_fontedging_t;
+
+typedef enum
+{
+  NONE_SK_FONTHINTING,
+  SLIGHT_SK_FONTHINTING,
+  NORMAL_SK_FONTHINTING,
+  FULL_SK_FONTHINTING,
+} sk_fonthinting_t;
+
+typedef enum
+{
+  UPRIGHT_SK_FONTSLANT,
+  ITALIC_SK_FONTSLANT,
+  OBLIQUE_SK_FONTSLANT,
+} sk_fontslant_t;
+
+typedef enum
+{
+  NO_INVERT_SK_CONTRASTINVERTSTYLE,
+  INVERT_BRIGHTNESS_SK_CONTRASTINVERTSTYLE,
+  INVERT_LIGHTNESS_SK_CONTRASTINVERTSTYLE,
+} sk_contrastinvertstyle_t;
+
+typedef enum
+{
+  ALLOW_SK_IMAGECACHINGHINT,
+  DISALLOW_SK_IMAGECACHINGHINT,
+} sk_imagecachinghint_t;
+
+typedef enum
+{
+  DEFAULT_SK_LATTICERECTTYPE,
+  TRANSPARENT_SK_LATTICERECTTYPE,
+  FIXED_COLOR_SK_LATTICERECTTYPE,
+} sk_latticerecttype_t;
+
+typedef enum
+{
+  NONE_SK_MIPMAPMODE,
+  NEAREST_SK_MIPMAPMODE,
+  LINEAR_SK_MIPMAPMODE,
+} sk_mipmapmode_t;
+
+typedef enum
+{
+  FILL_SK_PAINTSTYLE,
+  STROKE_SK_PAINTSTYLE,
+  STROKE_AND_FILL_SK_PAINTSTYLE,
+} sk_paintstyle_t;
+
+typedef enum
+{
+  SMALL_SK_ARCSIZE,
+  LARGE_SK_ARCSIZE,
+} sk_patharcsize_t;
+
+typedef enum
+{
+  CW_SK_PATHDIRECTION,
+  CCW_SK_PATHDIRECTION,
+} sk_pathdirection_t;
+
+typedef enum
+{
+  TRANSLATE_SK_PATHEFFECT1DSTYLE,
+  ROTATE_SK_PATHEFFECT1DSTYLE,
+  MORPH_SK_PATHEFFECT1DSTYLE,
+} sk_patheffect1dstyle_t;
+
+typedef enum
+{
+  NORMAL_SK_PATHEFFECTTRIMMODE,
+  INVERTED_SK_PATHEFFECTTRIMMODE,
+} sk_patheffecttrimmode_t;
+
+typedef enum
+{
+  WINDING_SK_PATHFILLTYPE,
+  EVEN_ODD_SK_PATHFILLTYPE,
+  INVERSE_WINDING_SK_PATHFILLTYPE,
+  INVERSE_EVEN_ODD_SK_PATHFILLTYPE,
+} sk_pathfilltype_t;
+
 typedef enum
 {
   NO_SHADOW_FLAG = 0x00,
@@ -223,61 +337,256 @@ typedef enum
   CONCAVE_BLUR_ONLY_SHADOW_FLAG = 0x08,
   /** mask for all shadow flags */
   ALL_SHADOW_FLAG = 0x0F
-} sk_shadow_flags_t;
-
-typedef struct sk_paint_t sk_paint_t;
-
-// Path
-typedef struct sk_path_t sk_path_t;
-
-// Surface
-typedef struct sk_surface_t sk_surface_t;
+} sk_shadowflags_t;
 
 typedef enum
 {
-  TOP_LEFT_GR_SURFACE_ORIGIN,
-  BOTTOM_LEFT_GR_SURFACE_ORIGIN,
-} gr_surfaceorigin_t;
+  DIFFERENCE_SK_PATHOP,
+  INTERSECT_SK_PATHOP,
+  UNION_SK_PATHOP,
+  XOR_SK_PATHOP,
+  REVERSE_DIFFERENCE_SK_PATHOP,
+} sk_pathop_t;
 
 typedef enum
 {
-  UNKNOWN_SK_COLORTYPE = 0,
-  ALPHA_8_SK_COLORTYPE,
-  RGB_565_SK_COLORTYPE,
-  ARGB_4444_SK_COLORTYPE,
-  RGBA_8888_SK_COLORTYPE,
-  RGB_888X_SK_COLORTYPE,
-  BGRA_8888_SK_COLORTYPE,
-  RGBA_1010102_SK_COLORTYPE,
-  RGB_101010X_SK_COLORTYPE,
-  GRAY_8_SK_COLORTYPE,
-  RGBA_F16_NORM_SK_COLORTYPE,
-  RGBA_F16_SK_COLORTYPE,
-  RGBA_F32_SK_COLORTYPE,
-
-  // READONLY
-  R8G8_UNORM_SK_COLORTYPE,
-  A16_FLOAT_SK_COLORTYPE,
-  R16G16_FLOAT_SK_COLORTYPE,
-  A16_UNORM_SK_COLORTYPE,
-  R16G16_UNORM_SK_COLORTYPE,
-  R16G16B16A16_UNORM_SK_COLORTYPE,
-} sk_colortype_t;
-
-typedef struct sk_colorspace_t sk_colorspace_t;
-
-typedef struct sk_surfaceprops_t sk_surfaceprops_t;
-
-// Raster
-typedef struct sk_bitmap_t sk_bitmap_t;
+  MOVE_SK_PATHVERB,
+  LINE_SK_PATHVERB,
+  QUAD_SK_PATHVERB,
+  CONIC_SK_PATHVERB,
+  CUBIC_SK_PATHVERB,
+  CLOSE_SK_PATHVERB,
+} sk_pathverb_t;
 
 typedef enum
 {
-  UNKNOWN_SK_ALPHATYPE,
-  OPAQUE_SK_ALPHATYPE,
-  PREMUL_SK_ALPHATYPE,
-  UNPREMUL_SK_ALPHATYPE,
-} sk_alphatype_t;
+  UNKNOWN_SK_PIXELGEOMETRY,
+  RGB_HORIZONTAL_SK_PIXELGEOMETRY,
+  BGR_HORIZONTAL_SK_PIXELGEOMETRY,
+  RGB_VERTICAL_SK_PIXELGEOMETRY,
+  BGR_VERTICAL_SK_PIXELGEOMETRY,
+} sk_pixelgeometry_t;
+
+typedef enum
+{
+  DIFFERENCE_SK_REGIONOP,
+  INTERSECT_SK_REGIONOP,
+  UNION_SK_REGIONOP,
+  XOR_SK_REGIONOP,
+  REVERSE_DIFFERENCE_SK_REGIONOP,
+  REPLACE_SK_REGIONOP,
+} sk_regionop_t;
+
+typedef enum
+{
+  UPPER_LEFT_SK_RRECTCORNER,
+  UPPER_RIGHT_SK_RRECTCORNER,
+  LOWER_RIGHT_SK_RRECTCORNER,
+  LOWER_LEFT_SK_RRECTCORNER,
+} sk_rrectcorner_t;
+
+typedef enum
+{
+  SHADER_SK_RUNTIMEEFFECTCHILDTYPE,
+  COLOR_FILTER_SK_RUNTIMEEFFECTCHILDTYPE,
+  BLENDER_FILTER_SK_RUNTIMEEFFECTCHILDTYPE,
+} sk_runtimeeffectchildtype_t;
+
+typedef enum
+{
+  FLOAT_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  FLOAT2_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  FLOAT3_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  FLOAT4_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  FLOAT2X2_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  FLOAT3X3_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  FLOAT4X4_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  INT_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  INT2_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  INT3_SK_RUNTIMEEFFECTUNIFORMTYPE,
+  INT4_SK_RUNTIMEEFFECTUNIFORMTYPE,
+} sk_runtimeeffectuniformtype_t;
+
+typedef enum
+{
+  CLOSE_SK_SRCRECTCONSTRAINT,
+  FAST_SK_SRCRECTCONSTRAINT,
+} sk_srcrectconstraint_t;
+
+typedef enum
+{
+  BUTT_SK_STROKECAP,
+  ROUND_SK_STROKECAP,
+  SQUARE_SK_STROKECAP,
+} sk_strokecap_t;
+
+typedef enum
+{
+  MITER_SK_STROKEJOIN,
+  ROUND_SK_STROKEJOIN,
+  BEVEL_SK_STROKEJOIN,
+} sk_strokejoin_t;
+
+typedef enum
+{
+  UTF8_SK_TEXTENCODING,
+  UTF16_SK_TEXTENCODING,
+  UTF32_SK_TEXTENCODING,
+  GLYPH_ID_SK_TEXTENCODING,
+} sk_textencoding_t;
+
+typedef enum
+{
+  CLAMP_SK_TILEMODE,
+  REPEAT_SK_TILEMODE,
+  MIRROR_SK_TILEMODE,
+  DECAL_SK_TILEMODE,
+} sk_tilemode_t;
+
+typedef enum
+{
+  TRIANGLES_SK_VERTEXMODE,
+  TRIANGLE_STRIP_SK_VERTEXMODE,
+  TRIANGLE_FAN_SK_VERTEXMODE,
+} sk_vertexmode_t;
+
+typedef uint32_t sk_color_t;
+typedef uint16_t sk_glyphid_t;
+typedef int32_t sk_unichar_t;
+
+typedef struct
+{
+  float r;
+  float g;
+  float b;
+  float a;
+} sk_color4f_t;
+
+typedef struct
+{
+  float m_11;
+  float m_12;
+  float m_13;
+  float m_14;
+  float m_15;
+  float m_21;
+  float m_22;
+  float m_23;
+  float m_24;
+  float m_25;
+  float m_31;
+  float m_32;
+  float m_33;
+  float m_34;
+  float m_35;
+  float m_41;
+  float m_42;
+  float m_43;
+  float m_44;
+  float m_45;
+} sk_colormatrix_t;
+
+typedef struct
+{
+  float rx;
+  float ry;
+  float gx;
+  float gy;
+  float bx;
+  float by;
+  float wx;
+  float wy;
+} sk_colorspaceprimaries_t;
+
+typedef struct
+{
+  float g;
+  float a;
+  float b;
+  float c;
+  float d;
+  float e;
+  float f;
+} sk_colorspacetransferfn_t;
+
+typedef struct
+{
+  float m_11;
+  float m_12;
+  float m_13;
+  float m_21;
+  float m_22;
+  float m_23;
+  float m_31;
+  float m_32;
+  float m_33;
+} sk_colorspacexyz_t;
+
+typedef struct
+{
+  float b;
+  float c;
+} sk_cubicresampler_t;
+
+typedef struct
+{
+  int16_t time_zone_minutes;
+  uint16_t year;
+  uint8_t month;
+  uint8_t day_of_week;
+  uint8_t day;
+  uint8_t hour;
+  uint8_t minute;
+  uint8_t second;
+} sk_datetime_t;
+
+typedef struct
+{
+  void *glyphs;
+  void *pos;
+  void *utf8text;
+  void *clusters;
+} sk_textblob_builder_runbuffer_t;
+
+typedef struct
+{
+  uint32_t flags;
+  float top;
+  float ascent;
+  float descent;
+  float bottom;
+  float leading;
+  float avg_char_width;
+  float max_char_width;
+  float x_min;
+  float x_max;
+  float x_height;
+  float cap_height;
+  float underline_thickness;
+  float underline_position;
+  float strikeout_thickness;
+  float strikeout_position;
+} sk_fontmetrics_t;
+
+typedef struct
+{
+  int32_t weight;
+  int32_t width;
+  sk_fontslant_t slant;
+} sk_fontstyle_t;
+
+typedef struct
+{
+  sk_pixmap_t *pixmap;
+  int32_t duration;
+} sk_frame_t;
+
+typedef struct
+{
+  bool grayscale;
+  sk_contrastinvertstyle_t invert_style;
+  float contrast;
+} sk_highcontrastconfig_t;
 
 typedef struct
 {
@@ -288,308 +597,312 @@ typedef struct
   sk_colorspace_t *color_space;
 } sk_imageinfo_t;
 
-typedef enum
+typedef struct
 {
-  ALLOW_SK_IMAGE_CACHING_HINT,
-  DISALLOW_SK_IMAGE_CACHING_HINT,
-} sk_image_caching_hint_t;
-
-typedef enum
-{
-  NONE_SK_FILTER_QUALITY,
-  LOW_SK_FILTER_QUALITY,
-  MEDIUM_SK_FILTER_QUALITY,
-  HIGH_SK_FILTER_QUALITY
-} sk_filter_quality_t;
-
-typedef enum
-{
-  BMP_SK_ENCODED_FORMAT,
-  GIF_SK_ENCODED_FORMAT,
-  ICO_SK_ENCODED_FORMAT,
-  JPEG_SK_ENCODED_FORMAT,
-  PNG_SK_ENCODED_FORMAT,
-  WBMP_SK_ENCODED_FORMAT,
-  WEBP_SK_ENCODED_FORMAT,
-  PKM_SK_ENCODED_FORMAT,
-  KTX_SK_ENCODED_FORMAT,
-  ASTC_SK_ENCODED_FORMAT,
-  DNG_SK_ENCODED_FORMAT,
-  HEIF_SK_ENCODED_FORMAT,
-} sk_encoded_image_format_t;
-
-typedef struct sk_pixmap_t sk_pixmap_t;
-
-typedef struct sk_imagefilter_t sk_imagefilter_t;
-
-typedef struct sk_image_t sk_image_t;
-
-typedef enum
-{
-  STRICT_SRC_RECT_CONSTRAINT, // Sample only inside bounds; slower
-  FAST_SRC_RECT_CONSTRAINT,   // Sample outside bounds; faster
-} sk_src_rect_constraint_t;
+  int32_t x;
+  int32_t y;
+} sk_ipoint_t;
 
 typedef struct
 {
-  float B;
-  float C;
-} sk_cubic_resampler_t;
-
-typedef enum
-{
-  NEAREST_SK_FILTER_MODE,
-  LINEAR_SK_FILTER_MODE,
-  LAST_SK_FILTER_MODE = LINEAR_SK_FILTER_MODE,
-} sk_filter_mode_t;
-
-typedef enum
-{
-  NONE_SK_MIPMAP_MODE,
-  NEAREST_SK_MIPMAP_MODE,
-  LINEAR_SK_MIPMAP_MODE,
-  LAST_SK_MIPMAP_MODE = LINEAR_SK_MIPMAP_MODE,
-} sk_mipmap_mode_t;
+  int32_t left;
+  int32_t top;
+  int32_t right;
+  int32_t bottom;
+} sk_irect_t;
 
 typedef struct
 {
-  int maxAniso;
-  bool useCubic;
-  sk_cubic_resampler_t cubic;
-  sk_filter_mode_t filter;
-  sk_mipmap_mode_t mipmap;
-} sk_sampling_options_t;
-
-// Text
-typedef enum
-{
-  UTF8_SK_TEXT_ENCODING,     // uses bytes to represent UTF-8 or ASCII
-  UTF16_SK_TEXT_ENCODING,    // uses two byte words to represent most of Unicode
-  UTF32_SK_TEXT_ENCODING,    // uses four byte words to represent all of Unicode
-  GLYPH_ID_SK_TEXT_ENCODING, // uses two byte words to represent glyph indices
-} sk_text_encoding_t;
-
-typedef struct sk_textblob_t sk_textblob_t;
-typedef struct sk_textblob_builder_t sk_textblob_builder_t;
-
-typedef struct
-{
-  void *glyphs;
-  void *pos;
-  void *utf8text;
-  void *clusters;
-} sk_textblob_builder_runbuffer_t;
-
-// Font
-
-typedef struct
-{
-  uint32_t fFlags;
-  float fTop;
-  float fAscent;
-  float fDescent;
-  float fBottom;
-  float fLeading;
-  float fAvgCharWidth;
-  float fMaxCharWidth;
-  float fXMin;
-  float fXMax;
-  float fXHeight;
-  float fCapHeight;
-  float fUnderlineThickness;
-  float fUnderlinePosition;
-  float fStrikeoutThickness;
-  float fStrikeoutPosition;
-} sk_fontmetrics_t;
-
-typedef enum
-{
-  NONE_SK_FONT_HINTING,
-  SLIGHT_SK_FONT_HINTING,
-  NORMAL_SK_FONT_HINTING,
-  FULL_SK_FONT_HINTING,
-} sk_font_hinting_t;
-
-typedef enum
-{
-  ALIAS_SK_FONT_EDGING,
-  ANTIALIAS_SK_FONT_EDGING,
-  SUBPIXEL_ANTIALIAS_SK_FONT_EDGING,
-} sk_font_edging_t;
-
-typedef enum
-{
-  UPRIGHT_SK_FONT_STYLE_SLANT = 0,
-  ITALIC_SK_FONT_STYLE_SLANT = 1,
-  OBLIQUE_SK_FONT_STYLE_SLANT = 2,
-} sk_font_style_slant_t;
-
-typedef struct sk_font_t sk_font_t;
-
-/**
-   A sk_typeface_t pecifies the typeface and intrinsic style of a font.
-    This is used in the paint, along with optionally algorithmic settings like
-    textSize, textSkewX, textScaleX, kFakeBoldText_Mask, to specify
-    how text appears when drawn (and measured).
-
-    Typeface objects are immutable, and so they can be shared between threads.
-*/
-typedef struct sk_typeface_t sk_typeface_t;
-typedef uint32_t sk_font_table_tag_t;
-typedef struct sk_fontmgr_t sk_fontmgr_t;
-typedef struct sk_fontstyleset_t sk_fontstyleset_t;
-
-typedef enum
-{
-  UPRIGHT_SK_FONTSLANT,
-  ITALIC_SK_FONTSLANT,
-  OBLIQUE_SK_FONTSLANT,
-} sk_fontslant_t;
-
-typedef struct
-{
-  int32_t weight;
   int32_t width;
-  sk_fontslant_t slant;
-} sk_fontstyle_t;
-
-/**
-    A sk_data_ holds an immutable data buffer.
-*/
-typedef struct sk_data_t sk_data_t;
-
-////////////////////////////////////////////////
-//////////////////// GPU ///////////////////////
-typedef struct
-{
-  const void *fDevice;
-  const void *fQueue;
-  const void *fBinaryArchive;
-} gr_mtl_backend_context_t;
-
-typedef struct gr_direct_context_t gr_direct_context_t;
-
-typedef struct gr_backendrendertarget_t gr_backendrendertarget_t;
+  int32_t height;
+} sk_isize_t;
 
 typedef struct
 {
-  const void *fTexture;
-} gr_mtl_textureinfo_t;
-
-////////////////////////////////////////////////
-///////////////// PARAGRAPH ////////////////////
-typedef struct sk_paragraph_t sk_paragraph_t;
-typedef struct sk_paragraphbuilder_t sk_paragraphbuilder_t;
-typedef struct sk_paragraphstyle_t sk_paragraphstyle_t;
-typedef struct sk_textstyle_t sk_textstyle_t;
-typedef struct sk_strutstyle_t sk_strutstyle_t;
-
-typedef enum
-{
-  UPSTREAM_SK_AFFINITY,
-  DOWNSTREAM_SK_AFFINITY,
-} sk_affinity_t;
+  const int32_t *x_divs;
+  const int32_t *y_divs;
+  const sk_latticerecttype_t *rect_types;
+  int32_t x_count;
+  int32_t y_count;
+  const sk_irect_t *bounds;
+  const sk_color_t *colors;
+} sk_lattice_t;
 
 typedef struct
 {
-  int32_t position;
-  sk_affinity_t affinity;
-} sk_positionaffinity_t;
+  float scaleX, skewX, transX;
+  float skewY, scaleY, transY;
+  float persp0, persp1, persp2;
+} sk_matrix_t;
 
 typedef struct
 {
-  size_t start_index;
-  size_t end_index;
-  size_t end_excluding_whitespaces;
-  size_t end_including_newline;
-  bool is_hard_break;
-  double ascent;
-  double descent;
-  double height;
-  double width;
-  double left;
-  double baseline;
-  size_t line_number;
-} sk_metrics_t;
-
-typedef enum
-{
-  RIGHT_TO_LEFT_SK_TEXTDIRECTION,
-  LEFT_TO_RIGHT_SK_TEXTDIRECTION,
-} sk_textdirection_t;
+  float m_11;
+  float m_12;
+  float m_13;
+  float m_14;
+  float m_21;
+  float m_22;
+  float m_23;
+  float m_24;
+  float m_31;
+  float m_32;
+  float m_33;
+  float m_34;
+  float m_41;
+  float m_42;
+  float m_43;
+  float m_44;
+} sk_matrix44_t;
 
 typedef struct
 {
-  sk_rect_t rect;
-  sk_textdirection_t direction;
-} sk_textbox_t;
+  float x;
+  float y;
+} sk_point_t;
 
-typedef enum
+typedef struct
 {
-  TIGHT_SK_RECTHEIGHTSTYLE,
-  MAX_SK_RECTHEIGHTSTYLE,
-  INCLUDE_LINE_SPACING_MIDDLE_SK_RECTHEIGHTSTYLE,
-  INCLUDE_LINE_SPACING_TOP_SK_RECTHEIGHTSTYLE,
-  INCLUDE_LINE_SPACING_BOTTOM_SK_RECTHEIGHTSTYLE,
-  STRUT_SK_RECTHEIGHTSTYLE,
-} sk_rectheightstyle_t;
+  sk_pathverb_t verb;
+  sk_point_t points[4];
+  float conic_weight;
+} sk_pathiteratorelem_t;
 
-typedef enum
+typedef struct
 {
-  TIGHT_SK_RECTWIDTHSTYLE,
-  MAX_SK_RECTWIDTHSTYLE,
-} sk_rectwidthstyle_t;
+  const char *title;
+  const char *author;
+  const char *subject;
+  const char *keywords;
+  const char *creator;
+  const char *producer;
+  sk_datetime_t creation;
+  sk_datetime_t modified;
+  float raster_dpi;
+  bool pdfa;
+  int32_t encoding_quality;
+} sk_pdfmetadata_t;
 
-typedef enum
+typedef struct
 {
-  BASELINE_SK_PLACEHOLDERALIGNMENT,
-  ABOVE_BASELINE_SK_PLACEHOLDERALIGNMENT,
-  BELOW_BASELINE_SK_PLACEHOLDERALIGNMENT,
-  TOP_SK_PLACEHOLDERALIGNMENT,
-  BOTTOM_SK_PLACEHOLDERALIGNMENT,
-  MIDDLE_SK_PLACEHOLDERALIGNMENT,
-} sk_placeholderalignment_t;
+  float x;
+  float y;
+  float z;
+} sk_point3_t;
 
-typedef enum
+typedef struct
 {
-  ALPHABETIC_SK_TEXTBASELINE,
-  IDEOGRAPHIC_SK_TEXTBASELINE,
-} sk_textbaseline_t;
+  float left;
+  float top;
+  float right;
+  float bottom;
+} sk_rect_t;
+
+typedef struct
+{
+  float s_cos;
+  float s_sin;
+  float t_x;
+  float t_y;
+} sk_rotationscalematrix_t;
+
+typedef struct
+{
+  const int32_t max_anisotropic;
+  const bool use_cubic;
+  const sk_cubicresampler_t cubic;
+  const sk_filtermode_t filter;
+  const sk_mipmapmode_t mipmap;
+} sk_samplingoptions_t;
 
 typedef struct
 {
   float width;
   float height;
-  sk_placeholderalignment_t alignment;
-  sk_textbaseline_t baseline;
-  float baseline_offset;
-} sk_placeholderstyle_t;
-
-typedef enum
-{
-  LEFT_SK_TEXTALIGN,
-  RIGHT_SK_TEXTALIGN,
-  CENTER_SK_TEXTALIGN,
-  JUSTIFY_SK_TEXTALIGN,
-  START_SK_TEXTALIGN,
-  TERMINATE_SK_TEXTALIGN,
-} sk_textalign_t;
+} sk_size_t;
 
 typedef struct
 {
-  sk_color_t color;
-  sk_point_t offset;
-  double blur_radius;
-} sk_textshadow_t;
+  uint32_t flags;
+  sk_pixelgeometry_t pixel_geometry;
+} sk_surfaceprops_t;
+
+typedef sk_point_t sk_vector_t;
+
+typedef void (*sk_font_path_proc)(const sk_path_t *path, const sk_matrix_t *matrix, void *context);
+typedef void (*sk_image_raster_release_proc)(const void *pixels, void *context);
+typedef void (*sk_image_texture_release_proc)(void *context);
+typedef void (*sk_surface_raster_release_proc)(void *pixels, void *context);
+
+// Ganesh
+
+typedef struct gr_backendrendertarget_t gr_backendrendertarget_t;
+typedef struct gr_backendsemaphore_t gr_backendsemaphore_t;
+typedef struct gr_backendsurfacemutablestate_t gr_backendsurfacemutablestate_t;
+typedef struct gr_backendtexture_t gr_backendtexture_t;
+typedef struct gr_directcontext_t gr_directcontext_t;
+typedef struct gr_persistentcache_t gr_persistentcache_t;
+typedef struct gr_shadererrorhandler_t gr_shadererrorhandler_t;
 
 typedef enum
 {
-  SOLID_SK_TEXTDECORATIONSTYLE,
-  DOUBLE_SK_TEXTDECORATIONSTYLE,
-  DOTTED_SK_TEXTDECORATIONSTYLE,
-  DASHED_SK_TEXTDECORATIONSTYLE,
-  WAVY_SK_TEXTDECORATIONSTYLE,
-} sk_textdecorationstyle_t;
+  OPEN_GL_GR_BACKENDAPI,
+  VULKAN_GR_BACKENDAPI,
+  METAL_GR_BACKENDAPI,
+} gr_backendapi_t;
+
+typedef enum
+{
+  SKSL_GR_SHADERCACHESTRATEGY,
+  BACKEND_SOURCE_GR_SHADERCACHESTRATEGY,
+  BACKEND_BINARY_GR_SHADERCACHESTRATEGY,
+} gr_shadercachestrategy_t;
+
+typedef enum
+{
+  TOP_LEFT_GR_SURFACEORIGIN,
+  BOTTOM_LEFT_GR_SURFACEORIGIN,
+} gr_surfaceorigin_t;
+
+typedef struct
+{
+  int32_t buffer_map_threshold;
+  bool do_manual_mipmapping;
+  bool allow_path_mask_caching;
+  size_t glyph_cache_texture_maximum_bytes;
+  bool avoid_stencil_buffers;
+  int32_t runtime_program_cache_size;
+  gr_persistentcache_t *persistent_cache;
+  gr_shadercachestrategy_t shader_cache_strategy;
+  gr_shadererrorhandler_t *shader_error_handler;
+} gr_contextoptions_t;
+
+// Ganesh - OpenGL
+
+typedef struct gr_gl_interface_t gr_gl_interface_t;
+
+typedef uint32_t gl_enum_t;
+typedef uint32_t gl_uint_t;
+
+typedef struct
+{
+  gl_uint_t fboid;
+  gl_enum_t format;
+  bool is_protected;
+} gr_gl_framebufferinfo_t;
+
+typedef struct
+{
+  gl_enum_t target;
+  gl_uint_t id;
+  gl_enum_t format;
+  bool is_protected;
+} gr_gl_textureinfo_t;
+
+typedef void *(*gr_gl_get_proc)(void *context, const char name[]);
+
+// Ganesh - Metal
+
+typedef const void *gr_mtl_handle_t;
+
+typedef struct
+{
+  gr_mtl_handle_t texture;
+} gr_mtl_textureinfo_t;
+
+typedef struct
+{
+  gr_mtl_handle_t device;
+  gr_mtl_handle_t queue;
+  gr_mtl_handle_t binary_archive;
+} gr_mtl_backendcontext_t;
+
+// Ganesh - Vulkan
+
+typedef struct gr_vk_extensions_t gr_vk_extensions_t;
+
+#define NONCOHERENT_VK_ALLOC_FLAG (1 << 0)
+#define MAPPABLE_VK_ALLOC_FLAG (1 << 1)
+#define LAZILY_ALLOCATED_VK_ALLOC_FLAG (1 << 2)
+
+typedef uint32_t gr_vk_bool32_t;
+typedef int32_t gr_vk_chromalocation_t;
+typedef intptr_t gr_vk_device_t;
+typedef uint64_t gr_vk_devicememory_t;
+typedef uint64_t gr_vk_devicesize_t;
+typedef int32_t gr_vk_filter_t;
+typedef int32_t gr_vk_format_t;
+typedef uint32_t gr_vk_formatfeatureflags_t;
+typedef uint64_t gr_vk_image_t;
+typedef int32_t gr_vk_imagelayout_t;
+typedef int32_t gr_vk_imagetiling_t;
+typedef uint32_t gr_vk_imageusageflags_t;
+typedef intptr_t gr_vk_instance_t;
+typedef intptr_t gr_vk_physicaldevice_t;
+typedef intptr_t gr_vk_queue_t;
+typedef int32_t gr_vk_samplerycbcrmodelconversion_t;
+typedef int32_t gr_vk_samplerycbcrrange_t;
+typedef uint64_t gr_vk_semaphore_t;
+typedef int32_t gr_vk_sharingmode_t;
+
+typedef struct gr_vk_physicaldevicefeatures_t gr_vk_physicaldevicefeatures_t;
+typedef struct gr_vk_physicaldevicefeatures2_t gr_vk_physicaldevicefeatures2_t;
+
+typedef void *(*gr_vk_get_proc)(void *context, const char name[], gr_vk_instance_t instance, gr_vk_device_t device);
+
+typedef struct
+{
+  gr_vk_devicememory_t device_memory;
+  gr_vk_devicesize_t offset;
+  gr_vk_devicesize_t size;
+  uint32_t flags;
+  intptr_t memory;
+} gr_vk_alloc_t;
+
+typedef struct
+{
+  gr_vk_instance_t instance;
+  gr_vk_physicaldevice_t physical_device;
+  gr_vk_device_t device;
+  gr_vk_queue_t queue;
+  uint32_t graphics_queue_index;
+  uint32_t max_api_version;
+  const gr_vk_extensions_t *extensions;
+  const gr_vk_physicaldevicefeatures_t *physical_device_features;
+  const gr_vk_physicaldevicefeatures2_t *physical_device_features2;
+  void *get_context;
+  gr_vk_get_proc get_proc;
+  bool protected_context;
+} gr_vk_backendcontext_t;
+
+typedef struct
+{
+  gr_vk_format_t format;
+  uint64_t external_format;
+  gr_vk_samplerycbcrmodelconversion_t ycbcr_model;
+  gr_vk_samplerycbcrrange_t ycbcr_range;
+  gr_vk_chromalocation_t x_chroma_offset;
+  gr_vk_chromalocation_t y_chroma_offset;
+  gr_vk_filter_t chroma_filter;
+  gr_vk_bool32_t force_explicit_reconstruction;
+  gr_vk_formatfeatureflags_t format_features;
+} gr_vk_ycbcrconversioninfo_t;
+
+typedef struct
+{
+  gr_vk_image_t image;
+  gr_vk_alloc_t alloc;
+  gr_vk_imagetiling_t image_tiling;
+  gr_vk_imagelayout_t image_layout;
+  gr_vk_format_t format;
+  gr_vk_imageusageflags_t image_usage_flags;
+  uint32_t sample_count;
+  uint32_t level_count;
+  uint32_t current_queue_family;
+  bool protected_image;
+  gr_vk_ycbcrconversioninfo_t ycbcr_conversion_info;
+  gr_vk_sharingmode_t sharing_mode;
+} gr_vk_imageinfo_t;
 
 SK_C_PLUS_PLUS_END_GUARD
 #endif

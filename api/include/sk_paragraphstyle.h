@@ -1,7 +1,7 @@
 #ifndef sk_paragraphstyle_DEFINED
 #define sk_paragraphstyle_DEFINED
 
-#include "sk_types.h"
+#include "sk_paragraph_types.h"
 
 SK_C_PLUS_PLUS_BEGIN_GUARD
 
@@ -27,6 +27,7 @@ SK_C_API void sk_paragraphstyle_set_text_style(sk_paragraphstyle_t *self, sk_tex
 SK_C_API sk_strutstyle_t *sk_strutstyle_create(void);
 SK_C_API void sk_strutstyle_destroy(sk_strutstyle_t *self);
 SK_C_API bool sk_strutstyle_get_enabled(const sk_strutstyle_t *self);
+SK_C_API size_t sk_strutstyle_get_font_families(const sk_strutstyle_t *self, const char *result[]);
 SK_C_API float sk_strutstyle_get_font_size(const sk_strutstyle_t *self);
 SK_C_API void sk_strutstyle_get_font_style(const sk_strutstyle_t *self, /*out*/ sk_fontstyle_t *result);
 SK_C_API bool sk_strutstyle_get_force_height(const sk_strutstyle_t *self);

@@ -8,14 +8,18 @@ lipo_skiasharp() {
 }
 
 pack_macos() {
-  mkdir -p build/libskia.framework
+  local lib_name="$1"
+  rm -rf ${lib_name}.xcframework
+  mkdir -p build/lib${lib_name}.framework
 
-  lipo skia/out/Release-macos-arm64/libskia.a skia/out/Release-macos-x64/libskia.a -output build/libskia.framework/libskia -create
+  lipo skia/out/Release-macos-arm64/lib${lib_name}.a skia/out/Release-macos-x64/lib${lib_name}.a -output build/lib${lib_name}.framework/lib${lib_name} -create
   xcodebuild -create-xcframework \
-            -framework build/libskia.framework \
-            -output skia.xcframework
+            -framework build/lib${lib_name}.framework \
+            -output ${lib_name}.xcframework
 }
 
-rm -rf skia.xcframework
-pack_macos;
+pack_macos skia;
+pack_macos skparagraph;
+pack_macos skunicode;
+pack_macos skshaper;
 rm -rf build

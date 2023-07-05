@@ -1,0 +1,12 @@
+#ifndef gr_backendsurfacemutablestate_DEFINED
+#define gr_backendsurfacemutablestate_DEFINED
+
+#include "sk_types.h"
+
+SK_C_PLUS_PLUS_BEGIN_GUARD
+
+SK_C_API gr_backendsurfacemutablestate_t *gr_backendsurfacemutablestate_create(gr_vk_imagelayout_t image_layout, uint32_t queue_family_index);
+SK_C_API void gr_backendsurfacemutablestate_destroy(gr_backendsurfacemutablestate_t *self);
+
+SK_C_PLUS_PLUS_END_GUARD
+#endif

@@ -1,183 +1,228 @@
-#include "sk_mapping.h"
+#include <algorithm>
+#include <memory>
+
 #include "include/sk_font.h"
-#include "include/core/SkFont.h"
+#include "sk_mapping.h"
 
-sk_font_t *sk_font_new(void)
+sk_font_t *sk_font_create(sk_typeface_t *typeface, float size, float sx, float kx)
 {
-  return ToFont(new SkFont());
-};
+  return ToFont(new SkFont(sk_ref_sp(AsTypeface(typeface)), size, sx, kx));
+}
 
-sk_font_t *sk_font_new_with_values(sk_typeface_t *typeface, float size, float scaleX, float skewX)
+sk_font_t *sk_font_create2(const sk_font_t *font)
 {
-  return ToFont(new SkFont(sk_ref_sp(AsTypeface(typeface)), size, scaleX, skewX));
-};
+  return ToFont(new SkFont(AsFont(*font)));
+}
 
-void sk_font_delete(sk_font_t *font)
+void sk_font_destroy(sk_font_t *self)
 {
-  delete AsFont(font);
-};
+  delete AsFont(self);
+}
 
-bool sk_font_is_force_auto_hinting(const sk_font_t *font)
+bool sk_font_get_baseline_snap(const sk_font_t *self)
 {
-  return AsFont(font)->isForceAutoHinting();
-};
+  return AsFont(self)->isBaselineSnap();
+}
 
-void sk_font_set_force_auto_hinting(sk_font_t *font, bool value)
+sk_fontedging_t sk_font_get_edging(const sk_font_t *self)
 {
-  AsFont(font)->setForceAutoHinting(value);
-};
+  return ToFontEdging(AsFont(self)->getEdging());
+}
 
-bool sk_font_is_embedded_bitmaps(const sk_font_t *font)
+bool sk_font_get_embedded_bitmaps(const sk_font_t *self)
 {
-  return AsFont(font)->isEmbeddedBitmaps();
-};
+  return AsFont(self)->isEmbeddedBitmaps();
+}
 
-void sk_font_set_embedded_bitmaps(sk_font_t *font, bool value)
+bool sk_font_get_embolden(const sk_font_t *self)
 {
-  AsFont(font)->setEmbeddedBitmaps(value);
-};
+  return AsFont(self)->isEmbolden();
+}
 
-bool sk_font_is_subpixel(const sk_font_t *font)
+bool sk_font_get_force_auto_hinting(const sk_font_t *self)
 {
-  return AsFont(font)->isSubpixel();
-};
+  return AsFont(self)->isForceAutoHinting();
+}
 
-void sk_font_set_subpixel(sk_font_t *font, bool value)
+int32_t sk_font_get_glyphs(const sk_font_t *self, const void *text, size_t size, sk_textencoding_t encoding, sk_glyphid_t result[], int32_t max_count)
 {
-  AsFont(font)->setSubpixel(value);
-};
+  return AsFont(self)->textToGlyphs(text, size, AsTextEncoding(encoding), result, max_count);
+}
 
-bool sk_font_is_linear_metrics(const sk_font_t *font)
+int32_t sk_font_get_glyphs_count(const sk_font_t *self, const void *text, size_t size, sk_textencoding_t encoding)
 {
-  return AsFont(font)->isLinearMetrics();
-};
+  return AsFont(self)->countText(text, size, AsTextEncoding(encoding));
+}
 
-void sk_font_set_linear_metrics(sk_font_t *font, bool value)
+sk_fonthinting_t sk_font_get_hinting(const sk_font_t *self)
 {
-  AsFont(font)->setLinearMetrics(value);
-};
+  return ToFontHinting(AsFont(self)->getHinting());
+}
 
-bool sk_font_is_embolden(const sk_font_t *font)
+void sk_font_get_horizontal_positions(const sk_font_t *self, const sk_glyphid_t glyphs[], int32_t count, float result[], float origin)
 {
-  return AsFont(font)->isEmbolden();
-};
+  AsFont(self)->getXPos(glyphs, count, result, origin);
+}
 
-void sk_font_set_embolden(sk_font_t *font, bool value)
+size_t sk_font_get_intercepts(const sk_font_t *self, const sk_glyphid_t glyphs[], int32_t count, const sk_point_t positions[], const float bounds[2], float result[], const sk_paint_t *paint)
 {
-  AsFont(font)->setEmbolden(value);
-};
+  auto intercepts = AsFont(self)->getIntercepts(glyphs, count, AsPoint(positions), bounds[0], bounds[1], AsPaint(paint));
+  if (result)
+    std::copy(intercepts.begin(), intercepts.end(), result);
+  return intercepts.size();
+}
 
-bool sk_font_is_baseline_snap(const sk_font_t *font)
+bool sk_font_get_linear_metrics(const sk_font_t *self)
 {
-  return AsFont(font)->isBaselineSnap();
-};
+  return AsFont(self)->isLinearMetrics();
+}
 
-void sk_font_set_baseline_snap(sk_font_t *font, bool value)
+float sk_font_get_metrics(const sk_font_t *self, sk_fontmetrics_t *metrics)
 {
-  AsFont(font)->setBaselineSnap(value);
-};
+  return AsFont(self)->getMetrics(AsFontMetrics(metrics));
+}
 
-sk_font_edging_t sk_font_get_edging(const sk_font_t *font)
+sk_path_t *sk_font_get_path(const sk_font_t *self, sk_glyphid_t glyph)
 {
-  return static_cast<sk_font_edging_t>(AsFont(font)->getEdging());
-};
+  auto r = std::make_unique<SkPath>();
+  return AsFont(self)->getPath(glyph, r.get()) ? ToPath(r.release()) : nullptr;
+}
 
-void sk_font_set_edging(sk_font_t *font, sk_font_edging_t value)
+void sk_font_get_paths(const sk_font_t *self, const sk_glyphid_t glyphs[], int32_t count, sk_font_path_proc proc, void *proc_context)
 {
-  AsFont(font)->setEdging(static_cast<SkFont::Edging>(value));
-};
+  struct Rec
+  {
+    void *fContext;
+    sk_font_path_proc fProc;
+  } rec = {proc_context, proc};
 
-sk_font_hinting_t sk_font_get_hinting(const sk_font_t *font)
-{
-  return static_cast<sk_font_hinting_t>(AsFont(font)->getHinting());
-};
+  AsFont(self)->getPaths(
+      glyphs, count,
+      [](const SkPath *path, const SkMatrix &matrix, void *ctx)
+      {
+        Rec *rec = reinterpret_cast<Rec *>(ctx);
+        sk_matrix_t m = ToMatrix(matrix);
+        rec->fProc(ToPath(path), &m, rec->fContext);
+      },
+      &rec);
+}
 
-void sk_font_set_hinting(sk_font_t *font, sk_font_hinting_t value)
+void sk_font_get_positions(const sk_font_t *self, const sk_glyphid_t glyphs[], int32_t count, sk_point_t result[], const sk_point_t *origin)
 {
-  AsFont(font)->setHinting(static_cast<SkFontHinting>(value));
-};
+  AsFont(self)->getPos(glyphs, count, AsPoint(result), *AsPoint(origin));
+}
 
-sk_typeface_t *sk_font_get_typeface(const sk_font_t *font)
+float sk_font_get_scale_x(const sk_font_t *self)
 {
-  return ToTypeface(AsFont(font)->getTypeface());
-};
+  return AsFont(self)->getScaleX();
+}
 
-void sk_font_set_typeface(sk_font_t *font, sk_typeface_t *value)
+float sk_font_get_size(const sk_font_t *self)
 {
-  AsFont(font)->setTypeface(sk_ref_sp(AsTypeface(value)));
-};
+  return AsFont(self)->getSize();
+}
 
-float sk_font_get_size(const sk_font_t *font)
+float sk_font_get_skew_x(const sk_font_t *self)
 {
-  return AsFont(font)->getSize();
-};
+  return AsFont(self)->getSkewX();
+}
 
-void sk_font_set_size(sk_font_t *font, float value)
+bool sk_font_get_subpixel(const sk_font_t *self)
 {
-  AsFont(font)->setSize(value);
-};
+  return AsFont(self)->isSubpixel();
+}
 
-float sk_font_get_scale_x(const sk_font_t *font)
+sk_typeface_t *sk_font_get_typeface(const sk_font_t *self)
 {
-  return AsFont(font)->getScaleX();
-};
+  return ToTypeface(AsFont(self)->refTypeface().release());
+}
 
-void sk_font_set_scale_x(sk_font_t *font, float value)
+sk_typeface_t *sk_font_get_typeface_or_default(const sk_font_t *self)
 {
-  AsFont(font)->setScaleX(value);
-};
+  return ToTypeface(AsFont(self)->refTypefaceOrDefault().release());
+}
 
-float sk_font_get_skew_x(const sk_font_t *font)
+void sk_font_get_widths_bounds(const sk_font_t *self, const sk_glyphid_t glyphs[], int32_t count, float widths[], sk_rect_t bounds[], const sk_paint_t *paint)
 {
-  return AsFont(font)->getSkewX();
-};
+  AsFont(self)->getWidthsBounds(glyphs, count, widths, AsRect(bounds), AsPaint(paint));
+}
 
-void sk_font_set_skew_x(sk_font_t *font, float value)
+bool sk_font_is_equal(const sk_font_t *self, const sk_font_t *font)
 {
-  AsFont(font)->setSkewX(value);
-};
+  return AsFont(*self) == AsFont(*font);
+}
 
-int sk_font_text_to_glyphs(const sk_font_t *font, const void *text, size_t byteLength, sk_text_encoding_t encoding, uint16_t glyphs[], int maxGlyphCount)
+float sk_font_measure_text(const sk_font_t *self, const void *text, size_t size, sk_textencoding_t encoding, sk_rect_t *bounds, const sk_paint_t *paint)
 {
-  return AsFont(font)->textToGlyphs(text, byteLength, (SkTextEncoding)encoding, glyphs, maxGlyphCount);
-};
+  return AsFont(self)->measureText(text, size, AsTextEncoding(encoding), AsRect(bounds), AsPaint(paint));
+}
 
-uint16_t sk_font_unichar_to_glyph(const sk_font_t *font, int32_t uni)
+void sk_font_set_baseline_snap(sk_font_t *self, bool value)
 {
-  return AsFont(font)->unicharToGlyph(uni);
-};
+  AsFont(self)->setBaselineSnap(value);
+}
 
-void sk_font_unichars_to_glyphs(const sk_font_t *font, const int32_t uni[], int count, uint16_t glyphs[])
+void sk_font_set_edging(sk_font_t *self, sk_fontedging_t value)
 {
-  AsFont(font)->unicharsToGlyphs(uni, count, glyphs);
-};
+  AsFont(self)->setEdging(AsFontEdging(value));
+}
 
-float sk_font_measure_text(const sk_font_t *font, const void *text, size_t byteLength, sk_text_encoding_t encoding, sk_rect_t *bounds, const sk_paint_t *paint)
+void sk_font_set_embedded_bitmaps(sk_font_t *self, bool value)
 {
-  return AsFont(font)->measureText(text, byteLength, (SkTextEncoding)encoding, AsRect(bounds), AsPaint(paint));
-};
+  AsFont(self)->setEmbeddedBitmaps(value);
+}
 
-void sk_font_get_widths_bounds(const sk_font_t *font, const uint16_t glyphs[], int count, float widths[], sk_rect_t bounds[], const sk_paint_t *paint)
+void sk_font_set_embolden(sk_font_t *self, bool value)
 {
-  AsFont(font)->getWidthsBounds(glyphs, count, widths, AsRect(bounds), AsPaint(paint));
-};
+  AsFont(self)->setEmbolden(value);
+}
 
-void sk_font_get_pos(const sk_font_t *font, const uint16_t glyphs[], int count, sk_point_t pos[], sk_point_t *origin)
+void sk_font_set_force_auto_hinting(sk_font_t *self, bool value)
 {
-  AsFont(font)->getPos(glyphs, count, AsPoint(pos), AsPoint(*origin));
-};
+  AsFont(self)->setForceAutoHinting(value);
+}
 
-void sk_font_get_xpos(const sk_font_t *font, const uint16_t glyphs[], int count, float xpos[], float origin)
+void sk_font_set_hinting(sk_font_t *self, sk_fonthinting_t value)
 {
-  AsFont(font)->getXPos(glyphs, count, xpos, origin);
-};
+  AsFont(self)->setHinting(AsFontHinting(value));
+}
 
-bool sk_font_get_path(const sk_font_t *font, uint16_t glyph, sk_path_t *path)
+void sk_font_set_linear_metrics(sk_font_t *self, bool value)
 {
-  return AsFont(font)->getPath(glyph, AsPath(path));
-};
+  AsFont(self)->setLinearMetrics(value);
+}
 
-float sk_font_get_metrics(const sk_font_t *font, sk_fontmetrics_t *metrics)
+void sk_font_set_scale_x(sk_font_t *self, float value)
 {
-  return AsFont(font)->getMetrics(AsFontMetrics(metrics));
-};
+  AsFont(self)->setScaleX(value);
+}
+
+void sk_font_set_size(sk_font_t *self, float value)
+{
+  AsFont(self)->setSize(value);
+}
+
+void sk_font_set_skew_x(sk_font_t *self, float value)
+{
+  AsFont(self)->setSkewX(value);
+}
+
+void sk_font_set_subpixel(sk_font_t *self, bool value)
+{
+  AsFont(self)->setSubpixel(value);
+}
+
+void sk_font_set_typeface(sk_font_t *self, sk_typeface_t *typeface)
+{
+  AsFont(self)->setTypeface(sk_ref_sp(AsTypeface(typeface)));
+}
+
+sk_glyphid_t sk_font_unichar_to_glyph(const sk_font_t *self, sk_unichar_t unichar)
+{
+  return AsFont(self)->unicharToGlyph(unichar);
+}
+
+void sk_font_unichars_to_glyphs(const sk_font_t *self, const sk_unichar_t unichars[], int32_t count, sk_glyphid_t result[])
+{
+  AsFont(self)->unicharsToGlyphs(unichars, count, result);
+}
