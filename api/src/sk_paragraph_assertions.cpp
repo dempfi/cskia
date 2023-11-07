@@ -1,12 +1,12 @@
 #include <type_traits>
 
 #include "include/core/SkRefCnt.h"
-#include "modules/skparagraph/include/DartTypes.h"
 #include "include/sk_paragraph_types.h"
+#include "modules/skparagraph/include/DartTypes.h"
+#include "modules/skparagraph/include/Paragraph.h"
 #include "modules/skparagraph/include/TextShadow.h"
 #include "modules/skparagraph/include/TextStyle.h"
 #include "modules/skparagraph/include/TypefaceFontProvider.h"
-#include "modules/skparagraph/include/Paragraph.h"
 
 /*
  * ASSERTIONS OF DEFINITIONS

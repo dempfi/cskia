@@ -1,51 +1,43 @@
+#include "include/sk_path.h"
+
 #include <memory>
 
-#include "include/sk_path.h"
 #include "sk_mapping.h"
 
-void sk_opbuilder_add(sk_opbuilder_t *self, const sk_path_t *path, sk_pathop_t op)
-{
+void sk_opbuilder_add(sk_opbuilder_t* self, const sk_path_t* path, sk_pathop_t op) {
   AsOpBuilder(self)->add(AsPath(*path), AsPathOp(op));
 }
 
-sk_opbuilder_t *sk_opbuilder_create(void)
-{
+sk_opbuilder_t* sk_opbuilder_create(void) {
   return ToOpBuilder(new SkOpBuilder());
 }
 
-void sk_opbuilder_destroy(sk_opbuilder_t *self)
-{
+void sk_opbuilder_destroy(sk_opbuilder_t* self) {
   delete AsOpBuilder(self);
 }
 
-sk_path_t *sk_opbuilder_detach(sk_opbuilder_t *self)
-{
+sk_path_t* sk_opbuilder_detach(sk_opbuilder_t* self) {
   auto r = std::make_unique<SkPath>();
   return AsOpBuilder(self)->resolve(r.get()) ? ToPath(r.release()) : nullptr;
 }
 
-bool sk_path_contains(const sk_path_t *self, float x, float y)
-{
+bool sk_path_contains(const sk_path_t* self, float x, float y) {
   return AsPath(self)->contains(x, y);
 }
 
-int32_t sk_path_convert_conic_to_quads(const sk_point_t *point1, const sk_point_t *point2, const sk_point_t *point3, float weight, sk_point_t points[], int32_t power2)
-{
+int32_t sk_path_convert_conic_to_quads(const sk_point_t* point1, const sk_point_t* point2, const sk_point_t* point3, float weight, sk_point_t points[], int32_t power2) {
   return SkPath::ConvertConicToQuads(AsPoint(*point1), AsPoint(*point2), AsPoint(*point3), weight, AsPoint(points), power2);
 }
 
-sk_path_t *sk_path_create(const char svg[])
-{
+sk_path_t* sk_path_create(const char svg[]) {
   auto r = new SkPath();
   SkParsePath::FromSVGString(svg, r);
   return ToPath(r);
 }
 
-sk_path_t *sk_path_create2(sk_stream_t *stream)
-{
+sk_path_t* sk_path_create2(sk_stream_t* stream) {
   auto r = new SkPath();
-  if (AsStream(stream)->hasLength())
-  {
+  if (AsStream(stream)->hasLength()) {
     auto data = SkData::MakeFromStream(AsStream(stream), AsStream(stream)->getLength());
     if (data)
       r->readFromMemory(data->data(), data->size());
@@ -53,124 +45,105 @@ sk_path_t *sk_path_create2(sk_stream_t *stream)
   return ToPath(r);
 }
 
-void sk_path_destroy(sk_path_t *self)
-{
+void sk_path_destroy(sk_path_t* self) {
   delete AsPath(self);
 }
 
-void sk_path_get_bounds(const sk_path_t *self, sk_rect_t *result)
-{
+void sk_path_get_bounds(const sk_path_t* self, sk_rect_t* result) {
   *result = ToRect(AsPath(self)->getBounds());
 }
 
-sk_pathfilltype_t sk_path_get_fill_type(const sk_path_t *self)
-{
+uint32_t sk_path_get_generation_id(const sk_path_t* self) {
+  return AsPath(self)->getGenerationID();
+};
+
+sk_pathfilltype_t sk_path_get_fill_type(const sk_path_t* self) {
   return ToPathFillType(AsPath(self)->getFillType());
 }
 
-bool sk_path_get_last_point(const sk_path_t *self, sk_point_t *result)
-{
+bool sk_path_get_last_point(const sk_path_t* self, sk_point_t* result) {
   return AsPath(self)->getLastPt(AsPoint(result));
 }
 
-uint32_t sk_path_get_segment_masks(const sk_path_t *self)
-{
+uint32_t sk_path_get_segment_masks(const sk_path_t* self) {
   return AsPath(self)->getSegmentMasks();
 }
 
-void sk_path_get_tight_bounds(const sk_path_t *self, sk_rect_t *result)
-{
+void sk_path_get_tight_bounds(const sk_path_t* self, sk_rect_t* result) {
   *result = ToRect(AsPath(self)->computeTightBounds());
 }
 
-sk_path_t *sk_path_interpolate(const sk_path_t *self, const sk_path_t *ending, float weight)
-{
+sk_path_t* sk_path_interpolate(const sk_path_t* self, const sk_path_t* ending, float weight) {
   auto r = std::make_unique<SkPath>();
   return AsPath(self)->interpolate(AsPath(*ending), weight, r.get()) ? ToPath(r.release()) : nullptr;
 }
 
-bool sk_path_is_convex(const sk_path_t *self)
-{
+bool sk_path_is_convex(const sk_path_t* self) {
   return AsPath(self)->isConvex();
 }
 
-bool sk_path_is_empty(const sk_path_t *self)
-{
+bool sk_path_is_empty(const sk_path_t* self) {
   return AsPath(self)->isEmpty();
 }
 
-bool sk_path_is_finite(const sk_path_t *self)
-{
+bool sk_path_is_finite(const sk_path_t* self) {
   return AsPath(self)->isFinite();
 }
 
-bool sk_path_is_interpolatable(const sk_path_t *self, const sk_path_t *path)
-{
+bool sk_path_is_interpolatable(const sk_path_t* self, const sk_path_t* path) {
   return AsPath(self)->isInterpolatable(AsPath(*path));
 }
 
-bool sk_path_is_last_contour_closed(const sk_path_t *self)
-{
+bool sk_path_is_last_contour_closed(const sk_path_t* self) {
   return AsPath(self)->isLastContourClosed();
 }
 
-bool sk_path_is_line(const sk_path_t *self, sk_point_t lines[2])
-{
+bool sk_path_is_line(const sk_path_t* self, sk_point_t lines[2]) {
   return AsPath(self)->isLine(AsPoint(lines));
 }
 
-bool sk_path_is_oval(const sk_path_t *self, sk_rect_t *oval)
-{
+bool sk_path_is_oval(const sk_path_t* self, sk_rect_t* oval) {
   return AsPath(self)->isOval(AsRect(oval));
 }
 
-bool sk_path_is_rect(const sk_path_t *self, sk_rect_t *rect)
-{
+bool sk_path_is_rect(const sk_path_t* self, sk_rect_t* rect) {
   return AsPath(self)->isRect(AsRect(rect));
 }
 
-bool sk_path_is_rrect(const sk_path_t *self, sk_rrect_t *rrect)
-{
+bool sk_path_is_rrect(const sk_path_t* self, sk_rrect_t* rrect) {
   return AsPath(self)->isRRect(AsRRect(rrect));
 }
 
-sk_path_t *sk_path_op(const sk_path_t *self, const sk_path_t *path, sk_pathop_t op)
-{
+sk_path_t* sk_path_op(const sk_path_t* self, const sk_path_t* path, sk_pathop_t op) {
   auto r = std::make_unique<SkPath>();
   return Op(AsPath(*self), AsPath(*path), AsPathOp(op), r.get()) ? ToPath(r.release()) : nullptr;
 }
 
-void sk_path_serialize_to_stream(const sk_path_t *self, sk_wstream_t *w_stream)
-{
+void sk_path_serialize_to_stream(const sk_path_t* self, sk_wstream_t* w_stream) {
   sk_sp<SkData> data(AsPath(self)->serialize());
   AsWStream(w_stream)->write(data->data(), data->size());
 }
 
-sk_string_t *sk_path_to_svg(const sk_path_t *self)
-{
+sk_string_t* sk_path_to_svg(const sk_path_t* self) {
   auto r = SkParsePath::ToSVGString(AsPath(*self));
   return ToString(&r);
 }
 
-sk_path_t *sk_path_transform(const sk_path_t *self, const sk_matrix_t *matrix)
-{
+sk_path_t* sk_path_transform(const sk_path_t* self, const sk_matrix_t* matrix) {
   auto r = new SkPath();
   AsPath(self)->transform(AsMatrix(matrix), r);
   return ToPath(r);
 }
 
-sk_pathiterator_t *sk_pathiterator_create(const sk_path_t *path, bool force_close)
-{
+sk_pathiterator_t* sk_pathiterator_create(const sk_path_t* path, bool force_close) {
   return ToPathIterator(new SkPath::Iter(AsPath(*path), force_close));
 }
 
-void sk_pathiterator_destroy(sk_pathiterator_t *self)
-{
+void sk_pathiterator_destroy(sk_pathiterator_t* self) {
   delete AsPathIterator(self);
 }
 
-bool sk_pathiterator_next(sk_pathiterator_t *self, sk_pathiteratorelem_t *elem)
-{
+bool sk_pathiterator_next(sk_pathiterator_t* self, sk_pathiteratorelem_t* elem) {
   auto verb = AsPathIterator(self)->next(AsPoint(&elem->points[0]));
   if (verb == SkPath::kDone_Verb)
     return false;

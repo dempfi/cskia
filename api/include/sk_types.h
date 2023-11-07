@@ -1,13 +1,12 @@
 #ifndef sk_types_DEFINED
 #define sk_types_DEFINED
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 #define SK_C_PLUS_PLUS_BEGIN_GUARD \
-  extern "C"                       \
-  {
+  extern "C" {
 #define SK_C_PLUS_PLUS_END_GUARD }
 #else
 #include <stdbool.h>
@@ -113,16 +112,14 @@ typedef struct sk_wstreamadapter_t sk_wstreamadapter_t;
 #define NO_PRETTY_XML_SK_SVG_CANVAS_FLAG (1 << 1)
 #define RELATIVE_PATH_ENCODING_SK_SVG_CANVAS_FLAG (1 << 2)
 
-typedef enum
-{
+typedef enum {
   UNKNOWN_SK_ALPHATYPE,
   OPAQUE_SK_ALPHATYPE,
   PREMUL_SK_ALPHATYPE,
   UNPREMUL_SK_ALPHATYPE,
 } sk_alphatype_t;
 
-typedef enum
-{
+typedef enum {
   CLEAR_SK_BLENDMODE,
   SRC_SK_BLENDMODE,
   DEST_SK_BLENDMODE,
@@ -154,65 +151,59 @@ typedef enum
   LUMINOSITY_SK_BLENDMODE,
 } sk_blendmode_t;
 
-typedef enum
-{
+typedef enum {
   NORMAL_SK_BLURSTYLE,
   SOLID_SK_BLURSTYLE,
   OUTER_SK_BLURSTYLE,
   INNER_SK_BLURSTYLE,
 } sk_blurstyle_t;
 
-typedef enum
-{
+typedef enum {
   DIFFERENCE_SK_CLIPOP,
   INTERSECT_SK_CLIPOP,
 } sk_clipop_t;
 
-typedef enum
-{
+typedef enum {
   R_SK_COLORCHANNEL,
   G_SK_COLORCHANNEL,
   B_SK_COLORCHANNEL,
   A_SK_COLORCHANNEL,
 } sk_colorchannel_t;
 
-typedef enum
-{
+typedef enum {
   UNKNOWN_SK_COLORTYPE,
-  ALPHA8_SK_COLORTYPE,
-  RGB565_SK_COLORTYPE,
-  ARGB4444_SK_COLORTYPE,
-  RGBA8888_SK_COLORTYPE,
-  RGB888X_SK_COLORTYPE,
-  BGRA8888_SK_COLORTYPE,
-  RGBA1010102_SK_COLORTYPE,
-  BGRA1010102_SK_COLORTYPE,
-  RGB101010X_SK_COLORTYPE,
-  BGR101010X_SK_COLORTYPE,
-  BGR101010X_XR_COLORTYPE,
-  GRAY8_SK_COLORTYPE,
-  RGBAF16_SK_COLORTYPE,
-  RGBAF16CLAMPED_SK_COLORTYPE,
-  RGBAF32_SK_COLORTYPE,
-  RG88_SK_COLORTYPE,
-  ALPHAF16_SK_COLORTYPE,
-  RGF16_SK_COLORTYPE,
-  ALPHA16_SK_COLORTYPE,
-  RG1616_SK_COLORTYPE,
-  RGBA16161616_SK_COLORTYPE,
-  SRGBA8888_SK_COLORTYPE,
-  R8_SK_COLORTYPE,
+  ALPHA_8_SK_COLORTYPE,
+  RGB_565_SK_COLORTYPE,
+  ARGB_4444_SK_COLORTYPE,
+  RGBA_8888_SK_COLORTYPE,
+  RGB_888X_SK_COLORTYPE,
+  BGRA_8888_SK_COLORTYPE,
+  RGBA_1010102_SK_COLORTYPE,
+  BGRA_1010102_SK_COLORTYPE,
+  RGB_101010X_SK_COLORTYPE,
+  BGR_101010X_SK_COLORTYPE,
+  BGR_101010X_XR_COLORTYPE,
+  GRAY_8_SK_COLORTYPE,
+  RGBA_F16_NORM_SK_COLORTYPE,
+  RGBA_F16_SK_COLORTYPE,
+  RGBA_F32_SK_COLORTYPE,
+  R8G8_UNORM_SK_COLORTYPE,
+  A16_FLOAT_SK_COLORTYPE,
+  R16G16_FLOAT_SK_COLORTYPE,
+  A16_UNORM_SK_COLORTYPE,
+  R16G16_UNORM_SK_COLORTYPE,
+  R16G16B16A16_UNORM_SK_COLORTYPE,
+  SRGBA_8888_SK_COLORTYPE,
+  R8_UNORM_SK_COLORTYPE,
 } sk_colortype_t;
 
-typedef enum
-{
+typedef enum {
   POINTS_SK_DRAWPOINTSMODE,
   LINES_SK_DRAWPOINTSMODE,
   POLYGON_DRAWPOINTSMODE,
 } sk_drawpointsmode_t;
 
-typedef enum
-{
+typedef enum {
   BMP_SK_ENCODEDIMAGEFORMAT,
   GIF_SK_ENCODEDIMAGEFORMAT,
   ICO_SK_ENCODEDIMAGEFORMAT,
@@ -228,103 +219,88 @@ typedef enum
   AVIF_SK_ENCODEDIMAGEFORMAT,
 } sk_encodedimageformat_t;
 
-typedef enum
-{
+typedef enum {
   NEAREST_SK_FILTERMODE,
   LINEAR_SK_FILTERMODE,
 } sk_filtermode_t;
 
-typedef enum
-{
+typedef enum {
   ALIAS_SK_FONTEDGING,
   ANTI_ALIAS_SK_FONTEDGING,
   SUBPIXEL_ANTI_ALIAS_SK_FONTEDGING,
 } sk_fontedging_t;
 
-typedef enum
-{
+typedef enum {
   NONE_SK_FONTHINTING,
   SLIGHT_SK_FONTHINTING,
   NORMAL_SK_FONTHINTING,
   FULL_SK_FONTHINTING,
 } sk_fonthinting_t;
 
-typedef enum
-{
+typedef enum {
   UPRIGHT_SK_FONTSLANT,
   ITALIC_SK_FONTSLANT,
   OBLIQUE_SK_FONTSLANT,
 } sk_fontslant_t;
 
-typedef enum
-{
+typedef enum {
   NO_INVERT_SK_CONTRASTINVERTSTYLE,
   INVERT_BRIGHTNESS_SK_CONTRASTINVERTSTYLE,
   INVERT_LIGHTNESS_SK_CONTRASTINVERTSTYLE,
 } sk_contrastinvertstyle_t;
 
-typedef enum
-{
+typedef enum {
   ALLOW_SK_IMAGECACHINGHINT,
   DISALLOW_SK_IMAGECACHINGHINT,
 } sk_imagecachinghint_t;
 
-typedef enum
-{
+typedef enum {
   DEFAULT_SK_LATTICERECTTYPE,
   TRANSPARENT_SK_LATTICERECTTYPE,
   FIXED_COLOR_SK_LATTICERECTTYPE,
 } sk_latticerecttype_t;
 
-typedef enum
-{
+typedef enum {
   NONE_SK_MIPMAPMODE,
   NEAREST_SK_MIPMAPMODE,
   LINEAR_SK_MIPMAPMODE,
 } sk_mipmapmode_t;
 
-typedef enum
-{
+typedef enum {
   FILL_SK_PAINTSTYLE,
   STROKE_SK_PAINTSTYLE,
   STROKE_AND_FILL_SK_PAINTSTYLE,
 } sk_paintstyle_t;
 
-typedef enum
-{
+typedef enum {
   SMALL_SK_ARCSIZE,
   LARGE_SK_ARCSIZE,
 } sk_patharcsize_t;
 
-typedef enum
-{
+typedef enum {
   CW_SK_PATHDIRECTION,
   CCW_SK_PATHDIRECTION,
 } sk_pathdirection_t;
 
-typedef enum
-{
+typedef enum {
   TRANSLATE_SK_PATHEFFECT1DSTYLE,
   ROTATE_SK_PATHEFFECT1DSTYLE,
   MORPH_SK_PATHEFFECT1DSTYLE,
 } sk_patheffect1dstyle_t;
 
-typedef enum
-{
+typedef enum {
   NORMAL_SK_PATHEFFECTTRIMMODE,
   INVERTED_SK_PATHEFFECTTRIMMODE,
 } sk_patheffecttrimmode_t;
 
-typedef enum
-{
+typedef enum {
   WINDING_SK_PATHFILLTYPE,
   EVEN_ODD_SK_PATHFILLTYPE,
   INVERSE_WINDING_SK_PATHFILLTYPE,
   INVERSE_EVEN_ODD_SK_PATHFILLTYPE,
 } sk_pathfilltype_t;
 
-typedef enum
-{
+typedef enum {
   NO_SHADOW_FLAG = 0x00,
   /** The occluding object is not opaque. Knowing that the occluder is opaque allows
    * us to cull shadow geometry behind it and improve performance. */
@@ -339,8 +315,7 @@ typedef enum
   ALL_SHADOW_FLAG = 0x0F
 } sk_shadowflags_t;
 
-typedef enum
-{
+typedef enum {
   DIFFERENCE_SK_PATHOP,
   INTERSECT_SK_PATHOP,
   UNION_SK_PATHOP,
@@ -348,8 +323,7 @@ typedef enum
   REVERSE_DIFFERENCE_SK_PATHOP,
 } sk_pathop_t;
 
-typedef enum
-{
+typedef enum {
   MOVE_SK_PATHVERB,
   LINE_SK_PATHVERB,
   QUAD_SK_PATHVERB,
@@ -358,8 +332,7 @@ typedef enum
   CLOSE_SK_PATHVERB,
 } sk_pathverb_t;
 
-typedef enum
-{
+typedef enum {
   UNKNOWN_SK_PIXELGEOMETRY,
   RGB_HORIZONTAL_SK_PIXELGEOMETRY,
   BGR_HORIZONTAL_SK_PIXELGEOMETRY,
@@ -367,8 +340,7 @@ typedef enum
   BGR_VERTICAL_SK_PIXELGEOMETRY,
 } sk_pixelgeometry_t;
 
-typedef enum
-{
+typedef enum {
   DIFFERENCE_SK_REGIONOP,
   INTERSECT_SK_REGIONOP,
   UNION_SK_REGIONOP,
@@ -377,23 +349,20 @@ typedef enum
   REPLACE_SK_REGIONOP,
 } sk_regionop_t;
 
-typedef enum
-{
+typedef enum {
   UPPER_LEFT_SK_RRECTCORNER,
   UPPER_RIGHT_SK_RRECTCORNER,
   LOWER_RIGHT_SK_RRECTCORNER,
   LOWER_LEFT_SK_RRECTCORNER,
 } sk_rrectcorner_t;
 
-typedef enum
-{
+typedef enum {
   SHADER_SK_RUNTIMEEFFECTCHILDTYPE,
   COLOR_FILTER_SK_RUNTIMEEFFECTCHILDTYPE,
   BLENDER_FILTER_SK_RUNTIMEEFFECTCHILDTYPE,
 } sk_runtimeeffectchildtype_t;
 
-typedef enum
-{
+typedef enum {
   FLOAT_SK_RUNTIMEEFFECTUNIFORMTYPE,
   FLOAT2_SK_RUNTIMEEFFECTUNIFORMTYPE,
   FLOAT3_SK_RUNTIMEEFFECTUNIFORMTYPE,
@@ -407,44 +376,38 @@ typedef enum
   INT4_SK_RUNTIMEEFFECTUNIFORMTYPE,
 } sk_runtimeeffectuniformtype_t;
 
-typedef enum
-{
+typedef enum {
   CLOSE_SK_SRCRECTCONSTRAINT,
   FAST_SK_SRCRECTCONSTRAINT,
 } sk_srcrectconstraint_t;
 
-typedef enum
-{
+typedef enum {
   BUTT_SK_STROKECAP,
   ROUND_SK_STROKECAP,
   SQUARE_SK_STROKECAP,
 } sk_strokecap_t;
 
-typedef enum
-{
+typedef enum {
   MITER_SK_STROKEJOIN,
   ROUND_SK_STROKEJOIN,
   BEVEL_SK_STROKEJOIN,
 } sk_strokejoin_t;
 
-typedef enum
-{
+typedef enum {
   UTF8_SK_TEXTENCODING,
   UTF16_SK_TEXTENCODING,
   UTF32_SK_TEXTENCODING,
   GLYPH_ID_SK_TEXTENCODING,
 } sk_textencoding_t;
 
-typedef enum
-{
+typedef enum {
   CLAMP_SK_TILEMODE,
   REPEAT_SK_TILEMODE,
   MIRROR_SK_TILEMODE,
   DECAL_SK_TILEMODE,
 } sk_tilemode_t;
 
-typedef enum
-{
+typedef enum {
   TRIANGLES_SK_VERTEXMODE,
   TRIANGLE_STRIP_SK_VERTEXMODE,
   TRIANGLE_FAN_SK_VERTEXMODE,
@@ -454,16 +417,14 @@ typedef uint32_t sk_color_t;
 typedef uint16_t sk_glyphid_t;
 typedef int32_t sk_unichar_t;
 
-typedef struct
-{
+typedef struct {
   float r;
   float g;
   float b;
   float a;
 } sk_color4f_t;
 
-typedef struct
-{
+typedef struct {
   float m_11;
   float m_12;
   float m_13;
@@ -486,8 +447,7 @@ typedef struct
   float m_45;
 } sk_colormatrix_t;
 
-typedef struct
-{
+typedef struct {
   float rx;
   float ry;
   float gx;
@@ -498,8 +458,7 @@ typedef struct
   float wy;
 } sk_colorspaceprimaries_t;
 
-typedef struct
-{
+typedef struct {
   float g;
   float a;
   float b;
@@ -509,8 +468,7 @@ typedef struct
   float f;
 } sk_colorspacetransferfn_t;
 
-typedef struct
-{
+typedef struct {
   float m_11;
   float m_12;
   float m_13;
@@ -522,14 +480,12 @@ typedef struct
   float m_33;
 } sk_colorspacexyz_t;
 
-typedef struct
-{
+typedef struct {
   float b;
   float c;
 } sk_cubicresampler_t;
 
-typedef struct
-{
+typedef struct {
   int16_t time_zone_minutes;
   uint16_t year;
   uint8_t month;
@@ -540,16 +496,14 @@ typedef struct
   uint8_t second;
 } sk_datetime_t;
 
-typedef struct
-{
-  void *glyphs;
-  void *pos;
-  void *utf8text;
-  void *clusters;
+typedef struct {
+  void* glyphs;
+  void* pos;
+  void* utf8text;
+  void* clusters;
 } sk_textblob_builder_runbuffer_t;
 
-typedef struct
-{
+typedef struct {
   uint32_t flags;
   float top;
   float ascent;
@@ -568,75 +522,65 @@ typedef struct
   float strikeout_position;
 } sk_fontmetrics_t;
 
-typedef struct
-{
+typedef struct {
   int32_t weight;
   int32_t width;
   sk_fontslant_t slant;
 } sk_fontstyle_t;
 
-typedef struct
-{
-  sk_pixmap_t *pixmap;
+typedef struct {
+  sk_pixmap_t* pixmap;
   int32_t duration;
 } sk_frame_t;
 
-typedef struct
-{
+typedef struct {
   bool grayscale;
   sk_contrastinvertstyle_t invert_style;
   float contrast;
 } sk_highcontrastconfig_t;
 
-typedef struct
-{
+typedef struct {
   int32_t width;
   int32_t height;
   sk_colortype_t color_type;
   sk_alphatype_t alpha_type;
-  sk_colorspace_t *color_space;
+  sk_colorspace_t* color_space;
 } sk_imageinfo_t;
 
-typedef struct
-{
+typedef struct {
   int32_t x;
   int32_t y;
 } sk_ipoint_t;
 
-typedef struct
-{
+typedef struct {
   int32_t left;
   int32_t top;
   int32_t right;
   int32_t bottom;
 } sk_irect_t;
 
-typedef struct
-{
+typedef struct {
   int32_t width;
   int32_t height;
 } sk_isize_t;
 
-typedef struct
-{
-  const int32_t *x_divs;
-  const int32_t *y_divs;
-  const sk_latticerecttype_t *rect_types;
+typedef struct {
+  const int32_t* x_divs;
+  const int32_t* y_divs;
+  const sk_latticerecttype_t* rect_types;
   int32_t x_count;
   int32_t y_count;
-  const sk_irect_t *bounds;
-  const sk_color_t *colors;
+  const sk_irect_t* bounds;
+  const sk_color_t* colors;
 } sk_lattice_t;
 
-typedef struct
-{
+typedef struct {
   float scaleX, skewX, transX;
   float skewY, scaleY, transY;
   float persp0, persp1, persp2;
 } sk_matrix_t;
 
-typedef struct
-{
+typedef struct {
   float m_11;
   float m_12;
   float m_13;
@@ -655,27 +599,24 @@ typedef struct
   float m_44;
 } sk_matrix44_t;
 
-typedef struct
-{
+typedef struct {
   float x;
   float y;
 } sk_point_t;
 
-typedef struct
-{
+typedef struct {
   sk_pathverb_t verb;
   sk_point_t points[4];
   float conic_weight;
 } sk_pathiteratorelem_t;
 
-typedef struct
-{
-  const char *title;
-  const char *author;
-  const char *subject;
-  const char *keywords;
-  const char *creator;
-  const char *producer;
+typedef struct {
+  const char* title;
+  const char* author;
+  const char* subject;
+  const char* keywords;
+  const char* creator;
+  const char* producer;
   sk_datetime_t creation;
   sk_datetime_t modified;
   float raster_dpi;
@@ -683,31 +624,27 @@ typedef struct
   int32_t encoding_quality;
 } sk_pdfmetadata_t;
 
-typedef struct
-{
+typedef struct {
   float x;
   float y;
   float z;
 } sk_point3_t;
 
-typedef struct
-{
+typedef struct {
   float left;
   float top;
   float right;
   float bottom;
 } sk_rect_t;
 
-typedef struct
-{
+typedef struct {
   float s_cos;
   float s_sin;
   float t_x;
   float t_y;
 } sk_rotationscalematrix_t;
 
-typedef struct
-{
+typedef struct {
   const int32_t max_anisotropic;
   const bool use_cubic;
   const sk_cubicresampler_t cubic;
@@ -715,24 +652,22 @@ typedef struct
   const sk_mipmapmode_t mipmap;
 } sk_samplingoptions_t;
 
-typedef struct
-{
+typedef struct {
   float width;
   float height;
 } sk_size_t;
 
-typedef struct
-{
+typedef struct {
   uint32_t flags;
   sk_pixelgeometry_t pixel_geometry;
 } sk_surfaceprops_t;
 
 typedef sk_point_t sk_vector_t;
 
-typedef void (*sk_font_path_proc)(const sk_path_t *path, const sk_matrix_t *matrix, void *context);
-typedef void (*sk_image_raster_release_proc)(const void *pixels, void *context);
-typedef void (*sk_image_texture_release_proc)(void *context);
-typedef void (*sk_surface_raster_release_proc)(void *pixels, void *context);
+typedef void (*sk_font_path_proc)(const sk_path_t* path, const sk_matrix_t* matrix, void* context);
+typedef void (*sk_image_raster_release_proc)(const void* pixels, void* context);
+typedef void (*sk_image_texture_release_proc)(void* context);
+typedef void (*sk_surface_raster_release_proc)(void* pixels, void* context);
 
 // Ganesh
 
@@ -744,37 +679,33 @@ typedef struct gr_directcontext_t gr_directcontext_t;
 typedef struct gr_persistentcache_t gr_persistentcache_t;
 typedef struct gr_shadererrorhandler_t gr_shadererrorhandler_t;
 
-typedef enum
-{
+typedef enum {
   OPEN_GL_GR_BACKENDAPI,
   VULKAN_GR_BACKENDAPI,
   METAL_GR_BACKENDAPI,
 } gr_backendapi_t;
 
-typedef enum
-{
+typedef enum {
   SKSL_GR_SHADERCACHESTRATEGY,
   BACKEND_SOURCE_GR_SHADERCACHESTRATEGY,
   BACKEND_BINARY_GR_SHADERCACHESTRATEGY,
 } gr_shadercachestrategy_t;
 
-typedef enum
-{
+typedef enum {
   TOP_LEFT_GR_SURFACEORIGIN,
   BOTTOM_LEFT_GR_SURFACEORIGIN,
 } gr_surfaceorigin_t;
 
-typedef struct
-{
+typedef struct {
   int32_t buffer_map_threshold;
   bool do_manual_mipmapping;
   bool allow_path_mask_caching;
   size_t glyph_cache_texture_maximum_bytes;
   bool avoid_stencil_buffers;
   int32_t runtime_program_cache_size;
-  gr_persistentcache_t *persistent_cache;
+  gr_persistentcache_t* persistent_cache;
   gr_shadercachestrategy_t shader_cache_strategy;
-  gr_shadererrorhandler_t *shader_error_handler;
+  gr_shadererrorhandler_t* shader_error_handler;
 } gr_contextoptions_t;
 
 // Ganesh - OpenGL
@@ -784,34 +715,30 @@ typedef struct gr_gl_interface_t gr_gl_interface_t;
 typedef uint32_t gl_enum_t;
 typedef uint32_t gl_uint_t;
 
-typedef struct
-{
+typedef struct {
   gl_uint_t fboid;
   gl_enum_t format;
   bool is_protected;
 } gr_gl_framebufferinfo_t;
 
-typedef struct
-{
+typedef struct {
   gl_enum_t target;
   gl_uint_t id;
   gl_enum_t format;
   bool is_protected;
 } gr_gl_textureinfo_t;
 
-typedef void *(*gr_gl_get_proc)(void *context, const char name[]);
+typedef void* (*gr_gl_get_proc)(void* context, const char name[]);
 
 // Ganesh - Metal
 
-typedef const void *gr_mtl_handle_t;
+typedef const void* gr_mtl_handle_t;
 
-typedef struct
-{
+typedef struct {
   gr_mtl_handle_t texture;
 } gr_mtl_textureinfo_t;
 
-typedef struct
-{
+typedef struct {
   gr_mtl_handle_t device;
   gr_mtl_handle_t queue;
   gr_mtl_handle_t binary_archive;
@@ -848,10 +775,9 @@ typedef int32_t gr_vk_sharingmode_t;
 typedef struct gr_vk_physicaldevicefeatures_t gr_vk_physicaldevicefeatures_t;
 typedef struct gr_vk_physicaldevicefeatures2_t gr_vk_physicaldevicefeatures2_t;
 
-typedef void *(*gr_vk_get_proc)(void *context, const char name[], gr_vk_instance_t instance, gr_vk_device_t device);
+typedef void* (*gr_vk_get_proc)(void* context, const char name[], gr_vk_instance_t instance, gr_vk_device_t device);
 
-typedef struct
-{
+typedef struct {
   gr_vk_devicememory_t device_memory;
   gr_vk_devicesize_t offset;
   gr_vk_devicesize_t size;
@@ -859,24 +785,22 @@ typedef struct
   intptr_t memory;
 } gr_vk_alloc_t;
 
-typedef struct
-{
+typedef struct {
   gr_vk_instance_t instance;
   gr_vk_physicaldevice_t physical_device;
   gr_vk_device_t device;
   gr_vk_queue_t queue;
   uint32_t graphics_queue_index;
   uint32_t max_api_version;
-  const gr_vk_extensions_t *extensions;
-  const gr_vk_physicaldevicefeatures_t *physical_device_features;
-  const gr_vk_physicaldevicefeatures2_t *physical_device_features2;
-  void *get_context;
+  const gr_vk_extensions_t* extensions;
+  const gr_vk_physicaldevicefeatures_t* physical_device_features;
+  const gr_vk_physicaldevicefeatures2_t* physical_device_features2;
+  void* get_context;
   gr_vk_get_proc get_proc;
   bool protected_context;
 } gr_vk_backendcontext_t;
 
-typedef struct
-{
+typedef struct {
   gr_vk_format_t format;
   uint64_t external_format;
   gr_vk_samplerycbcrmodelconversion_t ycbcr_model;
@@ -888,8 +812,7 @@ typedef struct
   gr_vk_formatfeatureflags_t format_features;
 } gr_vk_ycbcrconversioninfo_t;
 
-typedef struct
-{
+typedef struct {
   gr_vk_image_t image;
   gr_vk_alloc_t alloc;
   gr_vk_imagetiling_t image_tiling;

@@ -1,8 +1,8 @@
 #include <type_traits>
 
-#include "include/sk_types.h"
-#include "include/core/SkBlender.h"
+#include "include/codec/SkEncodedImageFormat.h"
 #include "include/core/SkBlendMode.h"
+#include "include/core/SkBlender.h"
 #include "include/core/SkBlurTypes.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkClipOp.h"
@@ -11,7 +11,6 @@
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkData.h"
 #include "include/core/SkDocument.h"
-#include "include/core/SkEncodedImageFormat.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkFontMetrics.h"
 #include "include/core/SkFontStyle.h"
@@ -28,11 +27,11 @@
 #include "include/core/SkPicture.h"
 #include "include/core/SkPoint.h"
 #include "include/core/SkPoint3.h"
+#include "include/core/SkRRect.h"
+#include "include/core/SkRSXform.h"
 #include "include/core/SkRect.h"
 #include "include/core/SkRefCnt.h"
 #include "include/core/SkRegion.h"
-#include "include/core/SkRRect.h"
-#include "include/core/SkRSXform.h"
 #include "include/core/SkSamplingOptions.h"
 #include "include/core/SkShader.h"
 #include "include/core/SkSize.h"
@@ -40,7 +39,6 @@
 #include "include/core/SkSurfaceProps.h"
 #include "include/core/SkTextBlob.h"
 #include "include/core/SkTileMode.h"
-#include "include/core/SkTime.h"
 #include "include/core/SkTypeface.h"
 #include "include/core/SkTypes.h"
 #include "include/core/SkVertices.h"
@@ -51,6 +49,7 @@
 #include "include/effects/SkRuntimeEffect.h"
 #include "include/effects/SkTrimPathEffect.h"
 #include "include/pathops/SkPathOps.h"
+#include "include/sk_types.h"
 #include "include/svg/SkSVGCanvas.h"
 #include "modules/skcms/skcms.h"
 
@@ -139,7 +138,6 @@ static_assert(sizeof(SkRSXform) == sizeof(sk_rotationscalematrix_t), "");
 static_assert(sizeof(SkSamplingOptions) == sizeof(sk_samplingoptions_t), "");
 static_assert(sizeof(SkSize) == sizeof(sk_size_t), "");
 static_assert(sizeof(SkSurfaceProps) == sizeof(sk_surfaceprops_t), "");
-static_assert(sizeof(SkTime::DateTime) == sizeof(sk_datetime_t), "");
 static_assert(sizeof(SkVector) == sizeof(sk_vector_t), "");
 static_assert(sizeof(SkVector) == sizeof(sk_vector_t), "");
 
@@ -228,29 +226,29 @@ static_assert(static_cast<int>(SkColorChannel::kLastEnum) == static_cast<int>(Sk
 
 // SkColorType
 static_assert(static_cast<int>(kUnknown_SkColorType) == static_cast<int>(UNKNOWN_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kAlpha_8_SkColorType) == static_cast<int>(ALPHA8_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGB_565_SkColorType) == static_cast<int>(RGB565_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kARGB_4444_SkColorType) == static_cast<int>(ARGB4444_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGBA_8888_SkColorType) == static_cast<int>(RGBA8888_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGB_888x_SkColorType) == static_cast<int>(RGB888X_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kBGRA_8888_SkColorType) == static_cast<int>(BGRA8888_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGBA_1010102_SkColorType) == static_cast<int>(RGBA1010102_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kBGRA_1010102_SkColorType) == static_cast<int>(BGRA1010102_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGB_101010x_SkColorType) == static_cast<int>(RGB101010X_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kBGR_101010x_XR_SkColorType) == static_cast<int>(BGR101010X_XR_COLORTYPE), "");
-static_assert(static_cast<int>(kBGR_101010x_SkColorType) == static_cast<int>(BGR101010X_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kGray_8_SkColorType) == static_cast<int>(GRAY8_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGBA_F16Norm_SkColorType) == static_cast<int>(RGBAF16_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGBA_F16_SkColorType) == static_cast<int>(RGBAF16CLAMPED_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kRGBA_F32_SkColorType) == static_cast<int>(RGBAF32_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kR8G8_unorm_SkColorType) == static_cast<int>(RG88_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kA16_float_SkColorType) == static_cast<int>(ALPHAF16_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kR16G16_float_SkColorType) == static_cast<int>(RGF16_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kA16_unorm_SkColorType) == static_cast<int>(ALPHA16_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kR16G16_unorm_SkColorType) == static_cast<int>(RG1616_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kR16G16B16A16_unorm_SkColorType) == static_cast<int>(RGBA16161616_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kSRGBA_8888_SkColorType) == static_cast<int>(SRGBA8888_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kR8_unorm_SkColorType) == static_cast<int>(R8_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kAlpha_8_SkColorType) == static_cast<int>(ALPHA_8_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGB_565_SkColorType) == static_cast<int>(RGB_565_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kARGB_4444_SkColorType) == static_cast<int>(ARGB_4444_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGBA_8888_SkColorType) == static_cast<int>(RGBA_8888_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGB_888x_SkColorType) == static_cast<int>(RGB_888X_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kBGRA_8888_SkColorType) == static_cast<int>(BGRA_8888_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGBA_1010102_SkColorType) == static_cast<int>(RGBA_1010102_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kBGRA_1010102_SkColorType) == static_cast<int>(BGRA_1010102_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGB_101010x_SkColorType) == static_cast<int>(RGB_101010X_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kBGR_101010x_XR_SkColorType) == static_cast<int>(BGR_101010X_XR_COLORTYPE), "");
+static_assert(static_cast<int>(kBGR_101010x_SkColorType) == static_cast<int>(BGR_101010X_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kGray_8_SkColorType) == static_cast<int>(GRAY_8_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGBA_F16Norm_SkColorType) == static_cast<int>(RGBA_F16_NORM_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGBA_F16_SkColorType) == static_cast<int>(RGBA_F16_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGBA_F32_SkColorType) == static_cast<int>(RGBA_F32_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kR8G8_unorm_SkColorType) == static_cast<int>(R8G8_UNORM_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kA16_float_SkColorType) == static_cast<int>(A16_FLOAT_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kR16G16_float_SkColorType) == static_cast<int>(R16G16_FLOAT_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kA16_unorm_SkColorType) == static_cast<int>(A16_UNORM_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kR16G16_unorm_SkColorType) == static_cast<int>(R16G16_UNORM_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kR16G16B16A16_unorm_SkColorType) == static_cast<int>(R16G16B16A16_UNORM_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kSRGBA_8888_SkColorType) == static_cast<int>(SRGBA_8888_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kR8_unorm_SkColorType) == static_cast<int>(R8_UNORM_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kLastEnum_SkColorType) == static_cast<int>(kR8_unorm_SkColorType), "");
 
 // SkEncodedImageFormat

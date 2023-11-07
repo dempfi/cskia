@@ -5,7 +5,7 @@
 
 SK_C_PLUS_PLUS_BEGIN_GUARD
 
-SK_C_API void sk_graphics_dump_memory_statistics(sk_tracememorydump_t *trace_memory_dump);
+SK_C_API void sk_graphics_dump_memory_statistics(sk_tracememorydump_t* trace_memory_dump);
 SK_C_API int32_t sk_graphics_get_font_cache_count_limit(void);
 SK_C_API int32_t sk_graphics_get_font_cache_count_used(void);
 SK_C_API size_t sk_graphics_get_font_cache_limit(void);

@@ -1,15 +1,15 @@
 #ifndef sk_paragraph_mapping_DEFINED
 #define sk_paragraph_mapping_DEFINED
 
-#include "sk_mapping.h"
+#include "include/sk_paragraph_types.h"
 #include "modules/skparagraph/include/DartTypes.h"
 #include "modules/skparagraph/include/Paragraph.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
 #include "modules/skparagraph/include/ParagraphStyle.h"
-#include "include/sk_paragraph_types.h"
 #include "modules/skparagraph/include/TextShadow.h"
 #include "modules/skparagraph/include/TextStyle.h"
 #include "modules/skparagraph/include/TypefaceFontProvider.h"
+#include "sk_mapping.h"
 
 SK_DEF_CLASS_MAP(skia::textlayout::Paragraph, sk_paragraph_t, Paragraph)
 SK_DEF_CLASS_MAP(skia::textlayout::Paragraph::VisitorInfo, sk_paragraphvisitorinfo_t, ParagraphVisitorInfo)
@@ -36,8 +36,7 @@ SK_DEF_ENUM_MAP(skia::textlayout::TextHeightBehavior, uint32_t, TextHeightBehavi
  * CUSTOM MAPPING
  */
 
-static inline sk_metrics_t ToMetrics(const skia::textlayout::LineMetrics &metrics)
-{
+static inline sk_metrics_t ToMetrics(const skia::textlayout::LineMetrics& metrics) {
   return {
       metrics.fStartIndex,
       metrics.fEndIndex,

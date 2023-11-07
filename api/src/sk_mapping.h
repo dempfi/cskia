@@ -1,11 +1,11 @@
 #ifndef sk_mapping_DEFINED
 #define sk_mapping_DEFINED
 
-#include "include/sk_types.h"
 #include "include/codec/SkCodec.h"
+#include "include/codec/SkEncodedImageFormat.h"
 #include "include/core/SkAlphaType.h"
-#include "include/core/SkBlender.h"
 #include "include/core/SkBlendMode.h"
+#include "include/core/SkBlender.h"
 #include "include/core/SkBlurTypes.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkClipOp.h"
@@ -15,7 +15,6 @@
 #include "include/core/SkColorType.h"
 #include "include/core/SkData.h"
 #include "include/core/SkDocument.h"
-#include "include/core/SkEncodedImageFormat.h"
 #include "include/core/SkFlattenable.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkFontMetrics.h"
@@ -39,10 +38,10 @@
 #include "include/core/SkPictureRecorder.h"
 #include "include/core/SkPixmap.h"
 #include "include/core/SkPoint3.h"
-#include "include/core/SkRefCnt.h"
-#include "include/core/SkRegion.h"
 #include "include/core/SkRRect.h"
 #include "include/core/SkRSXform.h"
+#include "include/core/SkRefCnt.h"
+#include "include/core/SkRegion.h"
 #include "include/core/SkSamplingOptions.h"
 #include "include/core/SkScalar.h"
 #include "include/core/SkShader.h"
@@ -82,6 +81,7 @@
 #include "include/encode/SkEncoder.h"
 #include "include/encode/SkWebpEncoder.h"
 #include "include/pathops/SkPathOps.h"
+#include "include/sk_types.h"
 #include "include/svg/SkSVGCanvas.h"
 #include "include/utils/SkAnimCodecPlayer.h"
 #include "include/utils/SkParsePath.h"
@@ -110,11 +110,11 @@
 //   - C   Class |  type_t
 //   - Map       |  name
 
-#define SK_DEF_CLASS_MAP(type, type_t, name)          \
-  SK_DEF_TYPE_MAP(type *, type_t *, name)             \
-  SK_DEF_TYPE_MAP(type &, type_t &, name)             \
-  SK_DEF_TYPE_MAP(const type *, const type_t *, name) \
-  SK_DEF_TYPE_MAP(const type &, const type_t &, name)
+#define SK_DEF_CLASS_MAP(type, type_t, name)        \
+  SK_DEF_TYPE_MAP(type*, type_t*, name)             \
+  SK_DEF_TYPE_MAP(type&, type_t&, name)             \
+  SK_DEF_TYPE_MAP(const type*, const type_t*, name) \
+  SK_DEF_TYPE_MAP(const type&, const type_t&, name)
 
 // Enum mapping
 //
@@ -227,25 +227,21 @@ SK_DEF_ENUM_MAP(SkVertices::VertexMode, sk_vertexmode_t, VertexMode)
  * CUSTOM MAPPING
  */
 
-static inline SkFontStyle AsFontStyle(const sk_fontstyle_t *style)
-{
+static inline SkFontStyle AsFontStyle(const sk_fontstyle_t* style) {
   return SkFontStyle(style->weight, style->width, AsFontSlant(style->slant));
 }
-static inline sk_fontstyle_t ToFontStyle(const SkFontStyle &style)
-{
+static inline sk_fontstyle_t ToFontStyle(const SkFontStyle& style) {
   return {style.weight(), style.width(), ToFontSlant(style.slant())};
 }
 
-static inline SkEncoder::Frame AsFrame(const sk_frame_t *frame)
-{
+static inline SkEncoder::Frame AsFrame(const sk_frame_t* frame) {
   return {
       *AsPixmap(frame->pixmap),
       frame->duration,
   };
 }
 
-static inline SkImageInfo AsImageInfo(const sk_imageinfo_t *info)
-{
+static inline SkImageInfo AsImageInfo(const sk_imageinfo_t* info) {
   return SkImageInfo::Make(
       info->width,
       info->height,
@@ -253,8 +249,7 @@ static inline SkImageInfo AsImageInfo(const sk_imageinfo_t *info)
       AsAlphaType(info->alpha_type),
       sk_ref_sp(AsColorSpace(info->color_space)));
 }
-static inline sk_imageinfo_t ToImageInfo(const SkImageInfo &info)
-{
+static inline sk_imageinfo_t ToImageInfo(const SkImageInfo& info) {
   return {
       info.width(),
       info.height(),
@@ -270,16 +265,14 @@ static inline sk_imageinfo_t ToImageInfo(const SkImageInfo &info)
  * [ g h i ]      [ c f i ]
  */
 
-static inline SkMatrix AsMatrix(const sk_matrix_t *matrix)
-{
+static inline SkMatrix AsMatrix(const sk_matrix_t* matrix) {
   return SkMatrix::MakeAll(
       matrix->scaleX, matrix->skewX, matrix->transX,
       matrix->skewY, matrix->scaleY, matrix->transY,
       matrix->persp0, matrix->persp1, matrix->persp2);
 }
 
-static inline sk_matrix_t ToMatrix(const SkMatrix &matrix)
-{
+static inline sk_matrix_t ToMatrix(const SkMatrix& matrix) {
   sk_matrix_t m;
   m.scaleX = matrix.get(SkMatrix::kMScaleX);
   m.skewX = matrix.get(SkMatrix::kMSkewX);
@@ -300,16 +293,14 @@ static inline sk_matrix_t ToMatrix(const SkMatrix &matrix)
  * [ m n o p ]      [ d h l p ]
  */
 
-static inline SkM44 AsMatrix44(const sk_matrix44_t *matrix)
-{
+static inline SkM44 AsMatrix44(const sk_matrix44_t* matrix) {
   return SkM44(
       matrix->m_11, matrix->m_12, matrix->m_13, matrix->m_14,
       matrix->m_21, matrix->m_22, matrix->m_23, matrix->m_24,
       matrix->m_31, matrix->m_32, matrix->m_33, matrix->m_34,
       matrix->m_41, matrix->m_42, matrix->m_43, matrix->m_44);
 }
-static inline sk_matrix44_t ToMatrix44(const SkM44 &matrix)
-{
+static inline sk_matrix44_t ToMatrix44(const SkM44& matrix) {
   return {
       matrix.rc(0, 0),
       matrix.rc(0, 1),
@@ -330,8 +321,7 @@ static inline sk_matrix44_t ToMatrix44(const SkM44 &matrix)
   };
 }
 
-static inline SkPDF::Metadata AsPDFMetadata(const sk_pdfmetadata_t *metadata)
-{
+static inline SkPDF::Metadata AsPDFMetadata(const sk_pdfmetadata_t* metadata) {
   SkPDF::Metadata result;
   result.fTitle = SkString(metadata->title);
   result.fAuthor = SkString(metadata->author);
@@ -376,7 +366,6 @@ static inline SkPDF::Metadata AsPDFMetadata(const sk_pdfmetadata_t *metadata)
 
 #include "include/gpu/GrBackendSemaphore.h"
 #include "include/gpu/GrBackendSurface.h"
-#include "include/gpu/GrBackendSurfaceMutableState.h"
 #include "include/gpu/GrContextOptions.h"
 #include "include/gpu/GrDirectContext.h"
 #include "include/gpu/GrTypes.h"
@@ -393,15 +382,13 @@ SK_DEF_ENUM_MAP(GrSurfaceOrigin, gr_surfaceorigin_t, GrSurfaceOrigin)
 
 SK_DEF_CLASS_MAP(GrBackendRenderTarget, gr_backendrendertarget_t, GrBackendRenderTarget)
 SK_DEF_CLASS_MAP(GrBackendSemaphore, gr_backendsemaphore_t, GrBackendSemaphore)
-SK_DEF_CLASS_MAP(GrBackendSurfaceMutableState, gr_backendsurfacemutablestate_t, GrBackendSurfaceMutableState)
 SK_DEF_CLASS_MAP(GrBackendTexture, gr_backendtexture_t, GrBackendTexture)
 SK_DEF_CLASS_MAP(GrContextOptions::PersistentCache, gr_persistentcache_t, GrPersistentCache)
 SK_DEF_CLASS_MAP(GrDirectContext, gr_directcontext_t, GrDirectContext)
 
 SK_DEF_CLASS_MAP(skgpu::ShaderErrorHandler, gr_shadererrorhandler_t, GrShaderErrorHandler)
 
-static inline GrContextOptions AsGrContextOptions(const gr_contextoptions_t *options)
-{
+static inline GrContextOptions AsGrContextOptions(const gr_contextoptions_t* options) {
   GrContextOptions result;
   result.fBufferMapThreshold = options->buffer_map_threshold;
   result.fDoManualMipmapping = options->do_manual_mipmapping;
@@ -435,12 +422,11 @@ SK_DEF_CLASS_MAP(GrGLTextureInfo, gr_gl_textureinfo_t, GrGLTextureInfo)
 #ifdef SK_METAL
 #define SK_ONLY_METAL(...) SK_FIRST_ARG(__VA_ARGS__)
 
+#include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
 #include "include/gpu/mtl/GrMtlBackendContext.h"
 #include "include/gpu/mtl/GrMtlTypes.h"
-#include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
 
-static inline GrMtlBackendContext AsGrMtlBackendContext(const gr_mtl_backendcontext_t *context)
-{
+static inline GrMtlBackendContext AsGrMtlBackendContext(const gr_mtl_backendcontext_t* context) {
   GrMtlBackendContext result = {};
   result.fDevice.reset(context->device);
   result.fQueue.reset(context->queue);
@@ -448,8 +434,7 @@ static inline GrMtlBackendContext AsGrMtlBackendContext(const gr_mtl_backendcont
   return result;
 }
 
-static inline GrMtlTextureInfo AsGrMtlTextureInfo(const gr_mtl_textureinfo_t *info)
-{
+static inline GrMtlTextureInfo AsGrMtlTextureInfo(const gr_mtl_textureinfo_t* info) {
   GrMtlTextureInfo result;
   result.fTexture.retain(info->texture);
   return result;
@@ -466,7 +451,7 @@ static inline GrMtlTextureInfo AsGrMtlTextureInfo(const gr_mtl_textureinfo_t *in
 #include "include/gpu/vk/GrVkTypes.h"
 #include "include/gpu/vk/VulkanTypes.h"
 
-SK_DEF_TYPE_MAP(PFN_vkVoidFunction, void *, PFN_vkVoidFunction)
+SK_DEF_TYPE_MAP(PFN_vkVoidFunction, void*, PFN_vkVoidFunction)
 SK_DEF_TYPE_MAP(VkDevice, gr_vk_device_t, VkDevice)
 SK_DEF_TYPE_MAP(VkDeviceMemory, gr_vk_devicememory_t, VkDeviceMemory)
 SK_DEF_TYPE_MAP(VkImage, gr_vk_image_t, VkImage)
@@ -485,8 +470,7 @@ SK_DEF_CLASS_MAP(GrVkYcbcrConversionInfo, gr_vk_ycbcrconversioninfo_t, GrVkYcbcr
 SK_DEF_CLASS_MAP(VkPhysicalDeviceFeatures, gr_vk_physicaldevicefeatures_t, VkPhysicalDeviceFeatures)
 SK_DEF_CLASS_MAP(VkPhysicalDeviceFeatures2, gr_vk_physicaldevicefeatures2_t, VkPhysicalDeviceFeatures2)
 
-static inline GrVkAlloc AsGrVkAlloc(const gr_vk_alloc_t *alloc)
-{
+static inline GrVkAlloc AsGrVkAlloc(const gr_vk_alloc_t* alloc) {
   GrVkAlloc result;
   result.fMemory = AsVkDeviceMemory(alloc->device_memory);
   result.fOffset = alloc->offset;
@@ -495,8 +479,7 @@ static inline GrVkAlloc AsGrVkAlloc(const gr_vk_alloc_t *alloc)
   return result;
 }
 
-static inline GrVkBackendContext AsGrVkBackendContext(const gr_vk_backendcontext_t *context)
-{
+static inline GrVkBackendContext AsGrVkBackendContext(const gr_vk_backendcontext_t* context) {
   GrVkBackendContext result;
   result.fInstance = AsVkInstance(context->instance);
   result.fPhysicalDevice = AsVkPhysicalDevice(context->physical_device);
@@ -507,10 +490,8 @@ static inline GrVkBackendContext AsGrVkBackendContext(const gr_vk_backendcontext
   result.fVkExtensions = AsGrVkExtensions(context->extensions);
   result.fDeviceFeatures = AsVkPhysicalDeviceFeatures(context->physical_device_features);
   result.fDeviceFeatures2 = AsVkPhysicalDeviceFeatures2(context->physical_device_features2);
-  if (context->get_context != nullptr)
-  {
-    result.fGetProc = [context = context->get_context, proc = context->get_proc](const char name[], VkInstance instance, VkDevice device)
-    {
+  if (context->get_context != nullptr) {
+    result.fGetProc = [context = context->get_context, proc = context->get_proc](const char name[], VkInstance instance, VkDevice device) {
       return AsPFN_vkVoidFunction(proc(context, name, ToVkInstance(instance), ToVkDevice(device)));
     };
   }
@@ -518,8 +499,7 @@ static inline GrVkBackendContext AsGrVkBackendContext(const gr_vk_backendcontext
   return result;
 }
 
-static inline GrVkImageInfo AsGrVkImageInfo(const gr_vk_imageinfo_t *info)
-{
+static inline GrVkImageInfo AsGrVkImageInfo(const gr_vk_imageinfo_t* info) {
   GrVkImageInfo result;
   result.fImage = AsVkImage(info->image);
   result.fAlloc = AsGrVkAlloc(&info->alloc);
