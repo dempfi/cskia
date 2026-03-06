@@ -23,6 +23,7 @@ let package = Package(
   ],
   products: [
     .library(name: "Skia", targets: ["Skia"]),
+    .library(name: "CSkia", targets: ["CSkia"]),
   ],
   targets: [
     .target(
