@@ -2,8 +2,6 @@
 
 import PackageDescription
 
-// Updated by CI on each release. To use local XCFrameworks instead,
-// change binaryTarget entries to use `path:` instead of `url:`.
 let version = "m145-fba326b"
 let checksums: [String: String] = [
   "skia": "de142dbff0fdeacac0b56b992d1f12a069db48c1cddc199e3982d5c3f43968f5",
@@ -12,28 +10,19 @@ let checksums: [String: String] = [
   "skunicode": "43990581d45ffcbb343082bb8f07801e02a2304525f579aba22c028623209876",
 ]
 
-let repo = "https://github.com/dempfi/skia"
+let repo = "https://github.com/dempfi/cskia"
 
 let package = Package(
-  name: "Skia",
+  name: "cskia",
   platforms: [
     .macOS(.v13),
     .iOS(.v15),
     .tvOS(.v15),
   ],
   products: [
-    .library(name: "Skia", targets: ["Skia"]),
-    .library(name: "CSkia", targets: ["CSkia"]),
+    .library(name: "cskia", targets: ["CSkia"]),
   ],
   targets: [
-    .target(
-      name: "Skia",
-      dependencies: ["CSkia"]
-    ),
-    .testTarget(
-      name: "SkiaTests",
-      dependencies: ["Skia"]
-    ),
     .target(
       name: "CSkia",
       dependencies: ["SkiaBinary", "SkParagraphBinary", "SkShaperBinary", "SkUnicodeBinary"],
