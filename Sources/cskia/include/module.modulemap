@@ -1,5 +1,4 @@
 module cskia [system] {
   umbrella header "umbrella.h"
-  link "c++"
   export *
 }
