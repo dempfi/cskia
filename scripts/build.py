@@ -42,41 +42,42 @@ def embed_api():
 
   src_files = [f.name for f in src_src.glob('*')]
 
-  # Remove any stale entries from core.gni (from previous builds)
-  core_gni = skia_dir / 'gn' / 'core.gni'
-  with core_gni.open() as f:
-    core_lines = f.readlines()
-  cleaned = [l for l in core_lines if not any(f in l for f in src_files)]
-  if len(cleaned) != len(core_lines):
-    with core_gni.open('w') as f:
-      f.writelines(cleaned)
-    print('> Removed stale C API entries from gn/core.gni')
-
-  # Register in gpu.gni (skia_ganesh_private) so files get SK_GANESH + SK_METAL defines
+  # Remove any stale entries from gpu.gni (from previous builds)
   gpu_gni = skia_dir / 'gn' / 'gpu.gni'
   with gpu_gni.open() as f:
+    gpu_lines = f.readlines()
+  cleaned = [l for l in gpu_lines if not any(f in l for f in src_files)]
+  if len(cleaned) != len(gpu_lines):
+    with gpu_gni.open('w') as f:
+      f.writelines(cleaned)
+    print('> Removed stale C API entries from gn/gpu.gni')
+
+  # Register in core.gni (skia_core_sources). The required module defines
+  # (SK_GANESH, SK_METAL, SK_UNICODE_*) are injected via extra_cflags in main().
+  core_gni = skia_dir / 'gn' / 'core.gni'
+  with core_gni.open() as f:
     lines = f.readlines()
 
   start_index = next(
-    (i for i, line in enumerate(lines) if line.strip().startswith('skia_ganesh_private = [')),
+    (i for i, line in enumerate(lines) if line.strip().startswith('skia_core_sources = [')),
     None
   )
   if start_index is None:
-    raise ValueError("Could not find 'skia_ganesh_private = [' in gn/gpu.gni")
+    raise ValueError("Could not find 'skia_core_sources = [' in gn/core.gni")
 
   # Check if already embedded
   for line in lines[start_index + 1:]:
     if any(f in line for f in src_files):
-      print('> C API sources already embedded in gn/gpu.gni')
+      print('> C API sources already embedded in gn/core.gni')
       return
 
   for f in src_files:
     lines.insert(start_index + 1, f'  "$_src/{f}",\n')
 
-  with gpu_gni.open('w') as f:
+  with core_gni.open('w') as f:
     f.writelines(lines)
 
-  print('> Embedded C API into Skia source tree (gpu.gni)')
+  print('> Embedded C API into Skia source tree (core.gni)')
 
 def main():
   os.chdir(os.path.join(common.REPO_ROOT, 'skia'))
@@ -118,7 +119,12 @@ def main():
     'skia_use_system_harfbuzz=false',
   ]
 
+  # C API source files span multiple Skia modules (core, GPU, paragraph, unicode)
+  # but are compiled as part of skia_core_sources. Inject the defines they need.
+  api_defines = ['-DSK_GANESH', '-DSK_UNICODE_ICU_IMPLEMENTATION', '-DSK_UNICODE_AVAILABLE']
+
   if 'macos' == target or isIos or isTvos:
+    api_defines += ['-DSK_METAL']
     args += [
       'extra_cflags_cc=["-frtti"]',
       'skia_use_metal=true',
@@ -133,14 +139,13 @@ def main():
       args += ['target_os="tvos"']
       if isTvosSim:
         args += ['ios_use_simulator=true']
-        args += ['extra_cflags=["-mtvos-simulator-version-min=14", "-DSK_BUILD_FOR_TVOS"]']
+        api_defines += ['-mtvos-simulator-version-min=14', '-DSK_BUILD_FOR_TVOS']
       else:
-        args += ['extra_cflags=["-mtvos-version-min=14", "-DSK_BUILD_FOR_TVOS"]']
+        api_defines += ['-mtvos-version-min=14', '-DSK_BUILD_FOR_TVOS']
     else:
-      if 'arm64' == machine:
-        args += ['extra_cflags=["-stdlib=libc++"]']
-      else:
-        args += ['extra_cflags=["-stdlib=libc++", "-mmacosx-version-min=10.13"]']
+      api_defines += ['-stdlib=libc++']
+      if 'x64' == machine:
+        api_defines += ['-mmacosx-version-min=10.13']
   elif 'linux' == target:
     if 'arm64' == machine:
       args += [
@@ -156,9 +161,9 @@ def main():
         'cxx="g++-9"',
       ]
   elif 'windows' == target:
+    api_defines += ['-DSK_FONT_HOST_USE_SYSTEM_SETTINGS']
     args += [
       'skia_use_direct3d=true',
-      'extra_cflags=["-DSK_FONT_HOST_USE_SYSTEM_SETTINGS"]',
     ]
   elif 'android' == target:
     args += [
@@ -186,12 +191,16 @@ def main():
       'skia_enable_gpu=true',
       'skia_enable_svg=true',
       'skia_use_expat=true',
-      'extra_cflags=["-DSK_SUPPORT_GPU=1", "-DSK_GL", "-DSK_DISABLE_LEGACY_SHADERCONTEXT"]',
     ]
+    api_defines += ['-DSK_SUPPORT_GPU=1', '-DSK_GL', '-DSK_DISABLE_LEGACY_SHADERCONTEXT']
 
   if 'linux' == host and 'arm64' == host_machine:
     tools_dir = 'tools'
     ninja = 'ninja-linux-arm64'
+
+  # Build extra_cflags from api_defines + any platform flags already set
+  flags_str = ', '.join(f'"{f}"' for f in api_defines)
+  args += [f'extra_cflags=[{flags_str}]']
 
   patch_sources()
   embed_api()
