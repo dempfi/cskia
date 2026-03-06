@@ -35,38 +35,48 @@ def embed_api():
   include_dst = skia_dir / 'include'
   src_src = api_dir / 'src'
   src_dst = skia_dir / 'src'
-  gni_file = skia_dir / 'gn' / 'core.gni'
 
   # Copy header and source files
   shutil.copytree(include_src, include_dst, dirs_exist_ok=True)
   shutil.copytree(src_src, src_dst, dirs_exist_ok=True)
 
-  # Register source files in GN build
-  with gni_file.open() as f:
+  src_files = [f.name for f in src_src.glob('*')]
+
+  # Remove any stale entries from core.gni (from previous builds)
+  core_gni = skia_dir / 'gn' / 'core.gni'
+  with core_gni.open() as f:
+    core_lines = f.readlines()
+  cleaned = [l for l in core_lines if not any(f in l for f in src_files)]
+  if len(cleaned) != len(core_lines):
+    with core_gni.open('w') as f:
+      f.writelines(cleaned)
+    print('> Removed stale C API entries from gn/core.gni')
+
+  # Register in gpu.gni (skia_ganesh_private) so files get SK_GANESH + SK_METAL defines
+  gpu_gni = skia_dir / 'gn' / 'gpu.gni'
+  with gpu_gni.open() as f:
     lines = f.readlines()
 
   start_index = next(
-    (i for i, line in enumerate(lines) if line.strip().startswith('skia_core_sources = [')),
+    (i for i, line in enumerate(lines) if line.strip().startswith('skia_ganesh_private = [')),
     None
   )
   if start_index is None:
-    raise ValueError("Could not find 'skia_core_sources = [' in gn/core.gni")
-
-  src_files = [f.name for f in src_src.glob('*')]
+    raise ValueError("Could not find 'skia_ganesh_private = [' in gn/gpu.gni")
 
   # Check if already embedded
   for line in lines[start_index + 1:]:
     if any(f in line for f in src_files):
-      print('> C API sources already embedded in gn/core.gni')
+      print('> C API sources already embedded in gn/gpu.gni')
       return
 
   for f in src_files:
     lines.insert(start_index + 1, f'  "$_src/{f}",\n')
 
-  with gni_file.open('w') as f:
+  with gpu_gni.open('w') as f:
     f.writelines(lines)
 
-  print('> Embedded C API into Skia source tree')
+  print('> Embedded C API into Skia source tree (gpu.gni)')
 
 def main():
   os.chdir(os.path.join(common.REPO_ROOT, 'skia'))
