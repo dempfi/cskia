@@ -432,8 +432,8 @@ SK_DEF_CLASS_MAP(GrGLTextureInfo, gr_gl_textureinfo_t, GrGLTextureInfo)
 
 static inline GrMtlBackendContext AsGrMtlBackendContext(const gr_mtl_backendcontext_t* context) {
   GrMtlBackendContext result = {};
-  result.fDevice.reset(context->device);
-  result.fQueue.reset(context->queue);
+  result.fDevice.retain(context->device);
+  result.fQueue.retain(context->queue);
   return result;
 }
 
