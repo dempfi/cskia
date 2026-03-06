@@ -1,0 +1,29 @@
+# Skia source and build tools (cloned at build time)
+/skia/
+/depot_tools/
+/tools/ninja-*
+
+# Build artifacts
+/build/
+*.xcframework
+*.xcframework.zip
+Skia-*.zip
+
+# Swift
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj
+*.xcworkspace
+DerivedData/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

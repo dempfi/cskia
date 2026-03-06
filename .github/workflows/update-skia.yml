@@ -1,0 +1,71 @@
+name: Check for Skia Updates
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Weekly on Monday at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for newer Skia milestone
+        id: check
+        run: |
+          CURRENT=$(cat skia-version)
+          echo "Current version: $CURRENT"
+
+          # Extract current milestone number
+          CURRENT_M=$(echo "$CURRENT" | grep -oP 'm\K\d+')
+
+          # Find the latest chrome/m* branch from upstream Skia
+          LATEST_BRANCH=$(git ls-remote --heads https://github.com/google/skia.git 'refs/heads/chrome/m*' \
+            | awk '{print $2}' \
+            | sed 's|refs/heads/chrome/||' \
+            | sort -t'm' -k1 -V \
+            | tail -1)
+
+          LATEST_M=$(echo "$LATEST_BRANCH" | grep -oP 'm\K\d+')
+          echo "Latest upstream milestone: $LATEST_BRANCH (m$LATEST_M)"
+
+          if [ "$LATEST_M" -gt "$CURRENT_M" ]; then
+            # Get the HEAD commit of that branch
+            COMMIT=$(git ls-remote https://github.com/google/skia.git "refs/heads/chrome/$LATEST_BRANCH" | cut -c1-7)
+            NEW_VERSION="${LATEST_BRANCH}-${COMMIT}"
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            echo "has_update=true" >> "$GITHUB_OUTPUT"
+            echo "New version available: $NEW_VERSION"
+          else
+            echo "has_update=false" >> "$GITHUB_OUTPUT"
+            echo "Already on latest milestone"
+          fi
+
+      - name: Create update PR
+        if: steps.check.outputs.has_update == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VERSION="${{ steps.check.outputs.new_version }}"
+          BRANCH="update-skia-${NEW_VERSION}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          echo "$NEW_VERSION" > skia-version
+          git add skia-version
+          git commit -m "Update Skia to $NEW_VERSION"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "Update Skia to $NEW_VERSION" \
+            --body "Automated PR to update Skia to milestone $NEW_VERSION.
+
+          The build workflow will run automatically to verify this version compiles successfully for all platforms." \
+            --base main \
+            --head "$BRANCH"

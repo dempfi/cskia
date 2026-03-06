@@ -1,0 +1,150 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_release:
+        description: 'Skip release steps (true/false)'
+        required: false
+        default: 'false'
+
+env:
+  VERSION_FILE: skia-version
+
+jobs:
+  read-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: version
+        run: echo "version=$(cat ${{ env.VERSION_FILE }})" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: read-version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS
+          - { target: macos, machine: arm64, os: macos-14 }
+          - { target: macos, machine: x64, os: macos-13 }
+          # iOS
+          - { target: ios, machine: arm64, os: macos-14 }
+          - { target: iosSim, machine: arm64, os: macos-14 }
+          - { target: iosSim, machine: x64, os: macos-13 }
+          # tvOS
+          - { target: tvos, machine: arm64, os: macos-14 }
+          - { target: tvosSim, machine: arm64, os: macos-14 }
+          # Linux
+          - { target: linux, machine: x64, os: ubuntu-22.04 }
+          # Windows
+          - { target: windows, machine: x64, os: windows-2022 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if release artifact already exists
+        if: github.event.inputs.skip_release != 'true' && github.ref == 'refs/heads/main'
+        run: python3 scripts/check_release.py --version ${{ needs.read-version.outputs.version }} --target ${{ matrix.target }} --machine ${{ matrix.machine }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Skia
+        run: python3 scripts/checkout.py --version ${{ needs.read-version.outputs.version }}
+
+      - name: Build Skia
+        run: python3 scripts/build.py --build-type Release --target ${{ matrix.target }} --machine ${{ matrix.machine }}
+
+      - name: Archive build artifacts
+        run: python3 scripts/archive.py --version ${{ needs.read-version.outputs.version }} --build-type Release --target ${{ matrix.target }} --machine ${{ matrix.machine }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Skia-${{ needs.read-version.outputs.version }}-${{ matrix.target }}-Release-${{ matrix.machine }}
+          path: '*.zip'
+          retention-days: 7
+
+  pack-apple:
+    needs: [read-version, build]
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all Apple build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Skia-*-{macos,ios,iosSim,tvos,tvosSim}-*
+          merge-multiple: true
+
+      - name: Extract build artifacts into skia/out/
+        run: |
+          for zip in Skia-*.zip; do
+            echo "Extracting $zip..."
+            mkdir -p skia
+            unzip -o "$zip" -d skia/
+          done
+
+      - name: Create XCFrameworks
+        run: python3 scripts/pack.py
+
+      - name: Upload XCFramework artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcframeworks
+          path: build/*.xcframework.zip
+          retention-days: 7
+
+      - name: Upload manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest
+          path: build/manifest.json
+
+  release:
+    if: github.event.inputs.skip_release != 'true' && github.ref == 'refs/heads/main'
+    needs: [read-version, pack-apple, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download XCFrameworks
+        uses: actions/download-artifact@v4
+        with:
+          name: xcframeworks
+          path: artifacts/
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Skia-*-linux-*
+          path: artifacts/
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Skia-*-windows-*
+          path: artifacts/
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(cat ${{ env.VERSION_FILE }})
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --notes "Skia $VERSION prebuilt binaries" \
+            artifacts/* \
+            || gh release upload "$VERSION" artifacts/* --clobber
