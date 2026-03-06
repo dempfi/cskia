@@ -16,6 +16,8 @@
 #include "sk_data.h"
 #include "sk_document.h"
 #include "sk_font.h"
+#include "sk_fontmgr.h"
+#include "sk_fontstyleset.h"
 #include "sk_graphics.h"
 #include "sk_image.h"
 #include "sk_imagefilter.h"

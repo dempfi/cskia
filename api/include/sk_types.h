@@ -50,6 +50,7 @@ typedef struct sk_document_t sk_document_t;
 typedef struct sk_flattenable_t sk_flattenable_t;
 typedef struct sk_font_t sk_font_t;
 typedef struct sk_fontmgr_t sk_fontmgr_t;
+typedef struct sk_fontstyleset_t sk_fontstyleset_t;
 typedef struct sk_image_t sk_image_t;
 typedef struct sk_imagefilter_t sk_imagefilter_t;
 typedef struct sk_maskfilter_t sk_maskfilter_t;

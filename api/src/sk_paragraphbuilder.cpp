@@ -55,6 +55,10 @@ void sk_paragraphbuilder_add_text(sk_paragraphbuilder_t* self, const char text[]
   AsParagraphBuilder(self)->addText(text, strlen(text));
 }
 
+void sk_paragraphbuilder_add_text_sized(sk_paragraphbuilder_t* self, const char text[], size_t length) {
+  AsParagraphBuilder(self)->addText(text, length);
+}
+
 sk_paragraph_t* sk_paragraphbuilder_build(sk_paragraphbuilder_t* self) {
   return ToParagraph(AsParagraphBuilder(self)->Build().release());
 }
