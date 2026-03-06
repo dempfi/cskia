@@ -1,5 +1,6 @@
 #include "include/sk_pathbuilder.h"
 
+#include "include/core/SkSpan.h"
 #include "sk_mapping.h"
 
 void sk_pathbuilder_add_arc(sk_pathbuilder_t* self, const sk_rect_t* oval, float start_angle, float sweep_angle) {
@@ -19,7 +20,7 @@ void sk_pathbuilder_add_path(sk_pathbuilder_t* self, const sk_path_t* path) {
 }
 
 void sk_pathbuilder_add_polygon(sk_pathbuilder_t* self, sk_point_t polygon[], int32_t count, bool is_closed) {
-  AsPathBuilder(self)->addPolygon(AsPoint(polygon), count, is_closed);
+  AsPathBuilder(self)->addPolygon(SkSpan<const SkPoint>(AsPoint(polygon), count), is_closed);
 }
 
 void sk_pathbuilder_add_rect(sk_pathbuilder_t* self, const sk_rect_t* rect, sk_pathdirection_t direction, uint32_t start_index) {
@@ -79,7 +80,7 @@ sk_pathfilltype_t sk_pathbuilder_get_fill_type(const sk_pathbuilder_t* self) {
 }
 
 void sk_pathbuilder_inc_reserve(sk_pathbuilder_t* self, int32_t extra_point_count, int32_t extra_verb_count) {
-  AsPathBuilder(self)->incReserve(extra_point_count, extra_verb_count);
+  AsPathBuilder(self)->incReserve(extra_point_count, extra_verb_count, 0);
 }
 
 void sk_pathbuilder_line_to(sk_pathbuilder_t* self, float x, float y) {
@@ -95,7 +96,7 @@ void sk_pathbuilder_offset(sk_pathbuilder_t* self, float dx, float dy) {
 }
 
 void sk_pathbuilder_polyline_to(sk_pathbuilder_t* self, const sk_point_t points[], int32_t count) {
-  AsPathBuilder(self)->polylineTo(AsPoint(points), count);
+  AsPathBuilder(self)->polylineTo(SkSpan<const SkPoint>(AsPoint(points), count));
 }
 
 void sk_pathbuilder_quad_to(sk_pathbuilder_t* self, float x0, float y0, float x1, float y1) {

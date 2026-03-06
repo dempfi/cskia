@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 
 #include "sk_mapping.h"
 
@@ -38,7 +39,7 @@ bool sk_font_get_force_auto_hinting(const sk_font_t* self) {
 }
 
 int32_t sk_font_get_glyphs(const sk_font_t* self, const void* text, size_t size, sk_textencoding_t encoding, sk_glyphid_t result[], int32_t max_count) {
-  return AsFont(self)->textToGlyphs(text, size, AsTextEncoding(encoding), result, max_count);
+  return (int32_t)AsFont(self)->textToGlyphs(text, size, AsTextEncoding(encoding), SkSpan<SkGlyphID>(result, max_count));
 }
 
 int32_t sk_font_get_glyphs_count(const sk_font_t* self, const void* text, size_t size, sk_textencoding_t encoding) {
@@ -50,11 +51,11 @@ sk_fonthinting_t sk_font_get_hinting(const sk_font_t* self) {
 }
 
 void sk_font_get_horizontal_positions(const sk_font_t* self, const sk_glyphid_t glyphs[], int32_t count, float result[], float origin) {
-  AsFont(self)->getXPos(glyphs, count, result, origin);
+  AsFont(self)->getXPos(SkSpan<const SkGlyphID>(glyphs, count), SkSpan<SkScalar>(result, count), origin);
 }
 
 size_t sk_font_get_intercepts(const sk_font_t* self, const sk_glyphid_t glyphs[], int32_t count, const sk_point_t positions[], const float bounds[2], float result[], const sk_paint_t* paint) {
-  auto intercepts = AsFont(self)->getIntercepts(glyphs, count, AsPoint(positions), bounds[0], bounds[1], AsPaint(paint));
+  auto intercepts = AsFont(self)->getIntercepts(SkSpan<const SkGlyphID>(glyphs, count), SkSpan<const SkPoint>(AsPoint(positions), count), bounds[0], bounds[1], AsPaint(paint));
   if (result)
     std::copy(intercepts.begin(), intercepts.end(), result);
   return intercepts.size();
@@ -69,8 +70,8 @@ float sk_font_get_metrics(const sk_font_t* self, sk_fontmetrics_t* metrics) {
 }
 
 sk_path_t* sk_font_get_path(const sk_font_t* self, sk_glyphid_t glyph) {
-  auto r = std::make_unique<SkPath>();
-  return AsFont(self)->getPath(glyph, r.get()) ? ToPath(r.release()) : nullptr;
+  auto r = AsFont(self)->getPath(glyph);
+  return r.has_value() ? ToPath(new SkPath(std::move(*r))) : nullptr;
 }
 
 void sk_font_get_paths(const sk_font_t* self, const sk_glyphid_t glyphs[], int32_t count, sk_font_path_proc proc, void* proc_context) {
@@ -80,7 +81,7 @@ void sk_font_get_paths(const sk_font_t* self, const sk_glyphid_t glyphs[], int32
   } rec = {proc_context, proc};
 
   AsFont(self)->getPaths(
-      glyphs, count,
+      SkSpan<const SkGlyphID>(glyphs, count),
       [](const SkPath* path, const SkMatrix& matrix, void* ctx) {
         Rec* rec = reinterpret_cast<Rec*>(ctx);
         sk_matrix_t m = ToMatrix(matrix);
@@ -90,7 +91,7 @@ void sk_font_get_paths(const sk_font_t* self, const sk_glyphid_t glyphs[], int32
 }
 
 void sk_font_get_positions(const sk_font_t* self, const sk_glyphid_t glyphs[], int32_t count, sk_point_t result[], const sk_point_t* origin) {
-  AsFont(self)->getPos(glyphs, count, AsPoint(result), *AsPoint(origin));
+  AsFont(self)->getPos(SkSpan<const SkGlyphID>(glyphs, count), SkSpan<SkPoint>(AsPoint(result), count), *AsPoint(origin));
 }
 
 float sk_font_get_scale_x(const sk_font_t* self) {
@@ -114,11 +115,13 @@ sk_typeface_t* sk_font_get_typeface(const sk_font_t* self) {
 }
 
 sk_typeface_t* sk_font_get_typeface_or_default(const sk_font_t* self) {
-  return ToTypeface(AsFont(self)->refTypefaceOrDefault().release());
+  return ToTypeface(AsFont(self)->refTypeface().release());
 }
 
 void sk_font_get_widths_bounds(const sk_font_t* self, const sk_glyphid_t glyphs[], int32_t count, float widths[], sk_rect_t bounds[], const sk_paint_t* paint) {
-  AsFont(self)->getWidthsBounds(glyphs, count, widths, AsRect(bounds), AsPaint(paint));
+  const auto nw = widths ? count : 0;
+  const auto nb = bounds ? count : 0;
+  AsFont(self)->getWidthsBounds(SkSpan<const SkGlyphID>(glyphs, count), SkSpan<SkScalar>(widths, nw), SkSpan<SkRect>(AsRect(bounds), nb), AsPaint(paint));
 }
 
 bool sk_font_is_equal(const sk_font_t* self, const sk_font_t* font) {
@@ -182,5 +185,5 @@ sk_glyphid_t sk_font_unichar_to_glyph(const sk_font_t* self, sk_unichar_t unicha
 }
 
 void sk_font_unichars_to_glyphs(const sk_font_t* self, const sk_unichar_t unichars[], int32_t count, sk_glyphid_t result[]) {
-  AsFont(self)->unicharsToGlyphs(unichars, count, result);
+  AsFont(self)->unicharsToGlyphs(SkSpan<const SkUnichar>(unichars, count), SkSpan<SkGlyphID>(result, count));
 }

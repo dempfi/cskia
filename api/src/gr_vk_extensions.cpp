@@ -3,7 +3,7 @@
 #include "sk_mapping.h"
 
 gr_vk_extensions_t* gr_vk_extensions_create(void) {
-  return SK_ONLY_VULKAN(ToGrVkExtensions(new GrVkExtensions()), nullptr);
+  return SK_ONLY_VULKAN(ToGrVkExtensions(new skgpu::VulkanExtensions()), nullptr);
 }
 
 void gr_vk_extensions_destroy(gr_vk_extensions_t* self) {

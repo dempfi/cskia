@@ -11,15 +11,15 @@ sk_textblob_t* sk_textblob_make_from_text(const void* text, size_t size, const s
 }
 
 sk_textblob_t* sk_textblob_make_from_text_horizontally_positioned(const void* text, size_t size, const float x_positions[], float y, const sk_font_t* font, sk_textencoding_t encoding) {
-  return ToTextBlob(SkTextBlob::MakeFromPosTextH(text, size, x_positions, y, AsFont(*font), AsTextEncoding(encoding)).release());
+  return ToTextBlob(SkTextBlob::MakeFromPosTextH(text, size, SkSpan<const SkScalar>(x_positions, size), y, AsFont(*font), AsTextEncoding(encoding)).release());
 }
 
 sk_textblob_t* sk_textblob_make_from_text_positioned(const void* text, size_t size, const sk_point_t positions[], const sk_font_t* font, sk_textencoding_t encoding) {
-  return ToTextBlob(SkTextBlob::MakeFromPosText(text, size, AsPoint(positions), AsFont(*font), AsTextEncoding(encoding)).release());
+  return ToTextBlob(SkTextBlob::MakeFromPosText(text, size, SkSpan<const SkPoint>(AsPoint(positions), size), AsFont(*font), AsTextEncoding(encoding)).release());
 }
 
 sk_textblob_t* sk_textblob_make_from_text_transform(const void* text, size_t size, const sk_rotationscalematrix_t matrices[], const sk_font_t* font, sk_textencoding_t encoding) {
-  return ToTextBlob(SkTextBlob::MakeFromRSXform(text, size, AsRotationScaleMatrix(matrices), AsFont(*font), AsTextEncoding(encoding)).release());
+  return ToTextBlob(SkTextBlob::MakeFromRSXform(text, size, SkSpan<const SkRSXform>(AsRotationScaleMatrix(matrices), size), AsFont(*font), AsTextEncoding(encoding)).release());
 }
 
 void sk_textblob_ref(const sk_textblob_t* self) {

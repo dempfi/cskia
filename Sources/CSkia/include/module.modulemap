@@ -4,5 +4,6 @@ module CSkia [system] {
   link "skparagraph"
   link "skshaper"
   link "skunicode"
+  link "c++"
   export *
 }

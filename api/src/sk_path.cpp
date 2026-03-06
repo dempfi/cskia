@@ -36,13 +36,15 @@ sk_path_t* sk_path_create(const char svg[]) {
 }
 
 sk_path_t* sk_path_create2(sk_stream_t* stream) {
-  auto r = new SkPath();
   if (AsStream(stream)->hasLength()) {
     auto data = SkData::MakeFromStream(AsStream(stream), AsStream(stream)->getLength());
-    if (data)
-      r->readFromMemory(data->data(), data->size());
+    if (data) {
+      auto result = SkPath::ReadFromMemory(data->data(), data->size());
+      if (result.has_value())
+        return ToPath(new SkPath(std::move(*result)));
+    }
   }
-  return ToPath(r);
+  return ToPath(new SkPath());
 }
 
 void sk_path_destroy(sk_path_t* self) {
@@ -130,9 +132,7 @@ sk_string_t* sk_path_to_svg(const sk_path_t* self) {
 }
 
 sk_path_t* sk_path_transform(const sk_path_t* self, const sk_matrix_t* matrix) {
-  auto r = new SkPath();
-  AsPath(self)->transform(AsMatrix(matrix), r);
-  return ToPath(r);
+  return ToPath(new SkPath(AsPath(self)->makeTransform(AsMatrix(matrix))));
 }
 
 sk_pathiterator_t* sk_pathiterator_create(const sk_path_t* path, bool force_close) {

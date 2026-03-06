@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "include/core/SkPathBuilder.h"
 #include "sk_paragraph_mapping.h"
 
 void sk_paragraph_destroy(sk_paragraph_t* self) {
@@ -93,27 +94,27 @@ void sk_paragraph_paint(sk_paragraph_t* self, sk_canvas_t* canvas, float x, floa
 }
 
 sk_path_t* sk_paragraph_to_path(sk_paragraph_t* self) {
-  auto r = new SkPath();
+  SkPathBuilder builder;
   AsParagraph(self)->visit([&](int lineNumber, const skia::textlayout::Paragraph::VisitorInfo* info) {
         if (!info)
             return;
 
         struct Rec {
-            SkPath*         fPath;
+            SkPathBuilder*  fBuilder;
             const SkPoint&  fOrigin;
             const SkPoint*  fPositions;
-        } rec = { r, info->origin, info->positions };
+        } rec = { &builder, info->origin, info->positions };
 
-        info->font.getPaths(info->glyphs, info->count, [](const SkPath* path, const SkMatrix& matrix, void* ctx) {
+        info->font.getPaths(SkSpan<const SkGlyphID>(info->glyphs, info->count), [](const SkPath* path, const SkMatrix& matrix, void* ctx) {
             Rec* rec = reinterpret_cast<Rec*>(ctx);
             if (path) {
                 SkMatrix m(matrix);
                 m.postTranslate(rec->fPositions->fX + rec->fOrigin.fX, rec->fPositions->fY + rec->fOrigin.fY);
-                rec->fPath->addPath(*path, m);
+                rec->fBuilder->addPath(path->makeTransform(m));
             }
             rec->fPositions += 1;
         }, &rec); });
-  return ToPath(r);
+  return ToPath(new SkPath(builder.detach()));
 }
 
 void sk_paragraph_visit(sk_paragraph_t* self, sk_paragraph_visit_proc proc, void* proc_context) {

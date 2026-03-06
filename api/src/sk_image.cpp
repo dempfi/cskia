@@ -43,7 +43,7 @@ bool sk_image_is_texture_backed(const sk_image_t* self) {
 }
 
 bool sk_image_is_valid(const sk_image_t* self, gr_directcontext_t* context) {
-  return AsImage(self)->isValid(SK_ONLY_GPU(AsGrDirectContext(context), nullptr));
+  return AsImage(self)->isValid(nullptr);
 }
 
 sk_image_t* sk_image_make_cross_context(gr_directcontext_t* context, const sk_pixmap_t* pixmap, bool build_mips, bool limit_to_max_texture_size) {
@@ -115,7 +115,7 @@ sk_shader_t* sk_image_make_shader(const sk_image_t* self, sk_tilemode_t tile_mod
 }
 
 sk_image_t* sk_image_make_subset(const sk_image_t* self, const sk_irect_t* subset, gr_directcontext_t* context) {
-  return ToImage(AsImage(self)->makeSubset(SK_ONLY_GPU(AsGrDirectContext(context), nullptr), AsIRect(*subset)).release());
+  return ToImage(AsImage(self)->makeSubset(nullptr, AsIRect(*subset), {}).release());
 }
 
 sk_image_t* sk_image_make_texture_image(const sk_image_t* self, gr_directcontext_t* context, bool is_mipmapped) {
@@ -123,7 +123,7 @@ sk_image_t* sk_image_make_texture_image(const sk_image_t* self, gr_directcontext
 }
 
 sk_image_t* sk_image_make_with_filter(const sk_image_t* self, gr_directcontext_t* context, const sk_imagefilter_t* filter, const sk_irect_t* subset, const sk_irect_t* clip_bounds, sk_irect_t* out_subset, sk_ipoint_t* offset) {
-  return SK_ONLY_GPU(ToImage(SkImages::MakeWithFilter(AsGrDirectContext(context), sk_ref_sp(AsImage(self)), AsImageFilter(filter), AsIRect(*subset), AsIRect(*clip_bounds), AsIRect(out_subset), AsIPoint(offset)).release());)
+  return SK_ONLY_GPU(ToImage(SkImages::MakeWithFilter(AsGrDirectContext(context), sk_ref_sp(AsImage(self)), AsImageFilter(filter), AsIRect(*subset), AsIRect(*clip_bounds), AsIRect(out_subset), AsIPoint(offset)).release()), nullptr);
 }
 
 sk_pixmap_t* sk_image_peek_pixels(const sk_image_t* self) {

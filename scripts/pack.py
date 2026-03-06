@@ -24,6 +24,11 @@ BUILD_DIR = os.path.join(REPO_ROOT, 'build')
 
 LIBRARIES = ['skia', 'skparagraph', 'skshaper', 'skunicode']
 
+# Some libraries are built as multiple .a files that need merging
+LIBRARY_COMPONENTS = {
+  'skunicode': ['skunicode_core', 'skunicode_icu'],
+}
+
 # Each platform maps to (device_targets, simulator_targets) where each target is (target_name, machine)
 APPLE_PLATFORMS = {
   'macos': {
@@ -40,8 +45,18 @@ APPLE_PLATFORMS = {
   },
 }
 
-def lib_path(target, machine, lib_name, build_type='Release'):
-  return os.path.join(SKIA_OUT, f'{build_type}-{target}-{machine}', f'lib{lib_name}.a')
+def lib_paths(target, machine, lib_name, build_type='Release'):
+  """Return list of .a files for a library (handles split libraries like skunicode)."""
+  components = LIBRARY_COMPONENTS.get(lib_name, [lib_name])
+  return [os.path.join(SKIA_OUT, f'{build_type}-{target}-{machine}', f'lib{c}.a') for c in components]
+
+def merge_components(paths, output):
+  """Merge multiple .a files into one using libtool."""
+  os.makedirs(os.path.dirname(output), exist_ok=True)
+  if len(paths) == 1:
+    shutil.copy2(paths[0], output)
+  else:
+    subprocess.check_call(['libtool', '-static', '-o', output] + paths)
 
 def lipo_merge(inputs, output):
   os.makedirs(os.path.dirname(output), exist_ok=True)
@@ -55,22 +70,35 @@ def create_xcframework(lib_name, platform, build_type='Release'):
   config = APPLE_PLATFORMS[platform]
   xcf_args = ['xcodebuild', '-create-xcframework']
 
-  if 'slices' in config:
-    # Non-simulator platform (macOS) — merge all slices into one universal
-    inputs = [lib_path(t, m, lib_name, build_type) for t, m in config['slices']]
-    available = [p for p in inputs if os.path.exists(p)]
+  def resolve_lib(target, machine):
+    """Resolve and merge component .a files for a library, return merged path or None."""
+    paths = lib_paths(target, machine, lib_name, build_type)
+    available = [p for p in paths if os.path.exists(p)]
     if not available:
       return None
+    merged = os.path.join(BUILD_DIR, 'tmp', f'{target}-{machine}', f'lib{lib_name}.a')
+    merge_components(available, merged)
+    return merged
+
+  if 'slices' in config:
+    # Non-simulator platform (macOS) — merge all slices into one universal
+    slice_libs = []
+    for t, m in config['slices']:
+      lib = resolve_lib(t, m)
+      if lib:
+        slice_libs.append(lib)
+    if not slice_libs:
+      return None
     merged = os.path.join(BUILD_DIR, platform, f'lib{lib_name}.a')
-    lipo_merge(available, merged)
+    lipo_merge(slice_libs, merged)
     xcf_args += ['-library', merged]
   else:
     # Device + simulator platform (iOS, tvOS)
-    device_inputs = [lib_path(t, m, lib_name, build_type) for t, m in config['device']]
-    sim_inputs = [lib_path(t, m, lib_name, build_type) for t, m in config['simulator']]
+    device_libs = [resolve_lib(t, m) for t, m in config['device']]
+    sim_libs = [resolve_lib(t, m) for t, m in config['simulator']]
 
-    device_available = [p for p in device_inputs if os.path.exists(p)]
-    sim_available = [p for p in sim_inputs if os.path.exists(p)]
+    device_available = [p for p in device_libs if p]
+    sim_available = [p for p in sim_libs if p]
 
     if not device_available and not sim_available:
       return None

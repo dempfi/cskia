@@ -29,8 +29,9 @@ void sk_region_destroy(sk_region_t* self) {
 }
 
 sk_path_t* sk_region_get_boundary_path(const sk_region_t* self) {
-  auto r = std::make_unique<SkPath>();
-  return AsRegion(self)->getBoundaryPath(r.get()) ? ToPath(r.release()) : nullptr;
+  if (AsRegion(self)->isEmpty())
+    return nullptr;
+  return ToPath(new SkPath(AsRegion(self)->getBoundaryPath()));
 }
 
 void sk_region_get_bounds(const sk_region_t* self, sk_irect_t* result) {

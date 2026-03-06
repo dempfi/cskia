@@ -54,17 +54,18 @@
 #include "modules/skcms/skcms.h"
 
 #if defined(SK_GANESH)
-#include "include/gpu/GrContextOptions.h"
-#include "include/gpu/GrDirectContext.h"
-#include "include/gpu/GrTypes.h"
+#include "include/gpu/ganesh/GrContextOptions.h"
+#include "include/gpu/ganesh/GrDirectContext.h"
+#include "include/gpu/ganesh/GrTypes.h"
 
 #ifdef SK_GL
-#include "include/gpu/gl/GrGLInterface.h"
-#include "include/gpu/gl/GrGLTypes.h"
+#include "include/gpu/ganesh/gl/GrGLInterface.h"
+#include "include/gpu/ganesh/gl/GrGLTypes.h"
 #endif
 
 #ifdef SK_VULKAN
-#include "include/gpu/vk/GrVkTypes.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
+#include "include/gpu/vk/VulkanTypes.h"
 #endif
 #endif
 
@@ -97,9 +98,9 @@ static_assert(static_cast<int>(SkSVGCanvas::kNoPrettyXML_Flag) == NO_PRETTY_XML_
 static_assert(static_cast<int>(SkSVGCanvas::kRelativePathEncoding_Flag) == RELATIVE_PATH_ENCODING_SK_SVG_CANVAS_FLAG, "");
 
 #ifdef SK_VULKAN
-static_assert(static_cast<int>(GrVkAlloc::kNoncoherent_Flag) == NONCOHERENT_VK_ALLOC_FLAG, "");
-static_assert(static_cast<int>(GrVkAlloc::kMappable_Flag) == MAPPABLE_VK_ALLOC_FLAG, "");
-static_assert(static_cast<int>(GrVkAlloc::kLazilyAllocated_Flag) == LAZILY_ALLOCATED_VK_ALLOC_FLAG, "");
+static_assert(static_cast<int>(skgpu::VulkanAlloc::kNoncoherent_Flag) == NONCOHERENT_VK_ALLOC_FLAG, "");
+static_assert(static_cast<int>(skgpu::VulkanAlloc::kMappable_Flag) == MAPPABLE_VK_ALLOC_FLAG, "");
+static_assert(static_cast<int>(skgpu::VulkanAlloc::kLazilyAllocated_Flag) == LAZILY_ALLOCATED_VK_ALLOC_FLAG, "");
 #endif
 
 /*
@@ -148,7 +149,7 @@ static_assert(sizeof(GrGLTextureInfo) == sizeof(gr_gl_textureinfo_t), "");
 #endif
 
 #ifdef SK_VULKAN
-static_assert(sizeof(GrVkYcbcrConversionInfo) == sizeof(gr_vk_ycbcrconversioninfo_t), "");
+static_assert(sizeof(skgpu::VulkanYcbcrConversionInfo) == sizeof(gr_vk_ycbcrconversioninfo_t), "");
 #endif
 #endif
 
@@ -235,17 +236,20 @@ static_assert(static_cast<int>(kBGRA_8888_SkColorType) == static_cast<int>(BGRA_
 static_assert(static_cast<int>(kRGBA_1010102_SkColorType) == static_cast<int>(RGBA_1010102_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kBGRA_1010102_SkColorType) == static_cast<int>(BGRA_1010102_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kRGB_101010x_SkColorType) == static_cast<int>(RGB_101010X_SK_COLORTYPE), "");
-static_assert(static_cast<int>(kBGR_101010x_XR_SkColorType) == static_cast<int>(BGR_101010X_XR_COLORTYPE), "");
 static_assert(static_cast<int>(kBGR_101010x_SkColorType) == static_cast<int>(BGR_101010X_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kBGR_101010x_XR_SkColorType) == static_cast<int>(BGR_101010X_XR_COLORTYPE), "");
+static_assert(static_cast<int>(kBGRA_10101010_XR_SkColorType) == static_cast<int>(BGRA_10101010_XR_COLORTYPE), "");
 static_assert(static_cast<int>(kRGBA_10x6_SkColorType) == static_cast<int>(RGBA_10x6_COLORTYPE), "");
 static_assert(static_cast<int>(kGray_8_SkColorType) == static_cast<int>(GRAY_8_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kRGBA_F16Norm_SkColorType) == static_cast<int>(RGBA_F16_NORM_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kRGBA_F16_SkColorType) == static_cast<int>(RGBA_F16_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kRGB_F16F16F16x_SkColorType) == static_cast<int>(RGB_F16F16F16X_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kRGBA_F32_SkColorType) == static_cast<int>(RGBA_F32_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kR8G8_unorm_SkColorType) == static_cast<int>(R8G8_UNORM_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kA16_float_SkColorType) == static_cast<int>(A16_FLOAT_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kR16G16_float_SkColorType) == static_cast<int>(R16G16_FLOAT_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kA16_unorm_SkColorType) == static_cast<int>(A16_UNORM_SK_COLORTYPE), "");
+static_assert(static_cast<int>(kR16_unorm_SkColorType) == static_cast<int>(R16_UNORM_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kR16G16_unorm_SkColorType) == static_cast<int>(R16G16_UNORM_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kR16G16B16A16_unorm_SkColorType) == static_cast<int>(R16G16B16A16_UNORM_SK_COLORTYPE), "");
 static_assert(static_cast<int>(kSRGBA_8888_SkColorType) == static_cast<int>(SRGBA_8888_SK_COLORTYPE), "");
@@ -266,6 +270,7 @@ static_assert(static_cast<int>(SkEncodedImageFormat::kASTC) == static_cast<int>(
 static_assert(static_cast<int>(SkEncodedImageFormat::kDNG) == static_cast<int>(DNG_SK_ENCODEDIMAGEFORMAT), "");
 static_assert(static_cast<int>(SkEncodedImageFormat::kHEIF) == static_cast<int>(HEIF_SK_ENCODEDIMAGEFORMAT), "");
 static_assert(static_cast<int>(SkEncodedImageFormat::kAVIF) == static_cast<int>(AVIF_SK_ENCODEDIMAGEFORMAT), "");
+static_assert(static_cast<int>(SkEncodedImageFormat::kJPEGXL) == static_cast<int>(JPEGXL_SK_ENCODEDIMAGEFORMAT), "");
 
 // SkFilterMode
 static_assert(static_cast<int>(SkFilterMode::kNearest) == static_cast<int>(NEAREST_SK_FILTERMODE), "");
@@ -413,11 +418,11 @@ static_assert(static_cast<int>(GrBackendApi::kOpenGL) == static_cast<int>(OPEN_G
 static_assert(static_cast<int>(GrBackendApi::kVulkan) == static_cast<int>(VULKAN_GR_BACKENDAPI), "");
 static_assert(static_cast<int>(GrBackendApi::kMetal) == static_cast<int>(METAL_GR_BACKENDAPI), "");
 
-// GrMipmapped
-static_assert(std::is_same<std::underlying_type_t<GrMipmapped>, bool>::value, "");
+// skgpu::Mipmapped
+static_assert(std::is_same<std::underlying_type_t<skgpu::Mipmapped>, bool>::value, "");
 
-// GrProtected
-static_assert(std::is_same<std::underlying_type_t<GrProtected>, bool>::value, "");
+// skgpu::Protected
+static_assert(std::is_same<std::underlying_type_t<skgpu::Protected>, bool>::value, "");
 
 // GrContextOption::ShaderCacheStrategy
 static_assert(static_cast<int>(GrContextOptions::ShaderCacheStrategy::kSkSL) == static_cast<int>(SKSL_GR_SHADERCACHESTRATEGY), "");

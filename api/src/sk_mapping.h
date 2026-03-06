@@ -80,8 +80,8 @@
 #include "include/pathops/SkPathOps.h"
 #include "include/sk_types.h"
 #include "include/svg/SkSVGCanvas.h"
-#include "include/utils/SkAnimCodecPlayer.h"
 #include "include/utils/SkParsePath.h"
+#include "modules/skresources/src/SkAnimCodecPlayer.h"
 #include "modules/skcms/skcms.h"
 
 // Auxiliary macro for mapping
@@ -361,19 +361,20 @@ static inline SkPDF::Metadata AsPDFMetadata(const sk_pdfmetadata_t* metadata) {
 #if defined(SK_GANESH)
 #define SK_ONLY_GPU(...) SK_FIRST_ARG(__VA_ARGS__)
 
-#include "include/gpu/GrBackendSemaphore.h"
-#include "include/gpu/GrBackendSurface.h"
-#include "include/gpu/GrContextOptions.h"
-#include "include/gpu/GrDirectContext.h"
-#include "include/gpu/GrTypes.h"
+#include "include/gpu/GpuTypes.h"
+#include "include/gpu/ganesh/GrBackendSemaphore.h"
+#include "include/gpu/ganesh/GrBackendSurface.h"
+#include "include/gpu/ganesh/GrContextOptions.h"
+#include "include/gpu/ganesh/GrDirectContext.h"
+#include "include/gpu/ganesh/GrTypes.h"
 #include "include/gpu/ShaderErrorHandler.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 
 SK_DEF_ENUM_MAP(GrBackendApi, gr_backendapi_t, GrBackendAPI)
 SK_DEF_ENUM_MAP(GrContextOptions::ShaderCacheStrategy, gr_shadercachestrategy_t, GrShaderCacheStrategy)
-SK_DEF_ENUM_MAP(GrMipmapped, bool, GrMipmapped)
-SK_DEF_ENUM_MAP(GrProtected, bool, GrProtected)
-SK_DEF_ENUM_MAP(GrRenderable, bool, GrRenderable)
+SK_DEF_ENUM_MAP(skgpu::Mipmapped, bool, GrMipmapped)
+SK_DEF_ENUM_MAP(skgpu::Protected, bool, GrProtected)
+SK_DEF_ENUM_MAP(skgpu::Renderable, bool, GrRenderable)
 SK_DEF_ENUM_MAP(skgpu::Budgeted, bool, Budgeted)
 SK_DEF_ENUM_MAP(GrSurfaceOrigin, gr_surfaceorigin_t, GrSurfaceOrigin)
 SK_DEF_ENUM_MAP(GrSyncCpu, gr_sync_cpu, GrSyncCpu)
@@ -405,10 +406,11 @@ static inline GrContextOptions AsGrContextOptions(const gr_contextoptions_t* opt
 #define SK_ONLY_GL(...) SK_FIRST_ARG(__VA_ARGS__)
 
 #include "include/gpu/ganesh/gl/GrGLBackendSurface.h"
-#include "include/gpu/gl/GrGLAssembleInterface.h"
-#include "include/gpu/gl/GrGLConfig.h"
-#include "include/gpu/gl/GrGLInterface.h"
-#include "include/gpu/gl/GrGLTypes.h"
+#include "include/gpu/ganesh/gl/GrGLAssembleInterface.h"
+#include "include/gpu/ganesh/gl/GrGLConfig.h"
+#include "include/gpu/ganesh/gl/GrGLDirectContext.h"
+#include "include/gpu/ganesh/gl/GrGLInterface.h"
+#include "include/gpu/ganesh/gl/GrGLTypes.h"
 
 SK_DEF_TYPE_MAP(GrGLGetProc, gr_gl_get_proc, GrGLGetProc)
 
@@ -422,15 +424,16 @@ SK_DEF_CLASS_MAP(GrGLTextureInfo, gr_gl_textureinfo_t, GrGLTextureInfo)
 #ifdef SK_METAL
 #define SK_ONLY_METAL(...) SK_FIRST_ARG(__VA_ARGS__)
 
+#include "include/gpu/ganesh/mtl/GrMtlBackendContext.h"
+#include "include/gpu/ganesh/mtl/GrMtlBackendSurface.h"
+#include "include/gpu/ganesh/mtl/GrMtlDirectContext.h"
+#include "include/gpu/ganesh/mtl/GrMtlTypes.h"
 #include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
-#include "include/gpu/mtl/GrMtlBackendContext.h"
-#include "include/gpu/mtl/GrMtlTypes.h"
 
 static inline GrMtlBackendContext AsGrMtlBackendContext(const gr_mtl_backendcontext_t* context) {
   GrMtlBackendContext result = {};
   result.fDevice.reset(context->device);
   result.fQueue.reset(context->queue);
-  result.fBinaryArchive.reset(context->binary_archive);
   return result;
 }
 
@@ -446,9 +449,11 @@ static inline GrMtlTextureInfo AsGrMtlTextureInfo(const gr_mtl_textureinfo_t* in
 #ifdef SK_VULKAN
 #define SK_ONLY_VULKAN(...) SK_FIRST_ARG(__VA_ARGS__)
 
-#include "include/gpu/vk/GrVkBackendContext.h"
-#include "include/gpu/vk/GrVkExtensions.h"
-#include "include/gpu/vk/GrVkTypes.h"
+#include "include/gpu/ganesh/vk/GrVkBackendSurface.h"
+#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
+#include "include/gpu/vk/VulkanBackendContext.h"
+#include "include/gpu/vk/VulkanExtensions.h"
 #include "include/gpu/vk/VulkanTypes.h"
 
 SK_DEF_TYPE_MAP(PFN_vkVoidFunction, void*, PFN_vkVoidFunction)
@@ -465,13 +470,13 @@ SK_DEF_ENUM_MAP(VkImageLayout, gr_vk_imagelayout_t, VkImageLayout)
 SK_DEF_ENUM_MAP(VkImageTiling, gr_vk_imagetiling_t, VkImageTiling)
 SK_DEF_ENUM_MAP(VkSharingMode, gr_vk_sharingmode_t, VkSharingMode)
 
-SK_DEF_CLASS_MAP(GrVkExtensions, gr_vk_extensions_t, GrVkExtensions)
-SK_DEF_CLASS_MAP(GrVkYcbcrConversionInfo, gr_vk_ycbcrconversioninfo_t, GrVkYcbcrConversionInfo)
+SK_DEF_CLASS_MAP(skgpu::VulkanExtensions, gr_vk_extensions_t, GrVkExtensions)
+SK_DEF_CLASS_MAP(skgpu::VulkanYcbcrConversionInfo, gr_vk_ycbcrconversioninfo_t, GrVkYcbcrConversionInfo)
 SK_DEF_CLASS_MAP(VkPhysicalDeviceFeatures, gr_vk_physicaldevicefeatures_t, VkPhysicalDeviceFeatures)
 SK_DEF_CLASS_MAP(VkPhysicalDeviceFeatures2, gr_vk_physicaldevicefeatures2_t, VkPhysicalDeviceFeatures2)
 
-static inline GrVkAlloc AsGrVkAlloc(const gr_vk_alloc_t* alloc) {
-  GrVkAlloc result;
+static inline skgpu::VulkanAlloc AsGrVkAlloc(const gr_vk_alloc_t* alloc) {
+  skgpu::VulkanAlloc result;
   result.fMemory = AsVkDeviceMemory(alloc->device_memory);
   result.fOffset = alloc->offset;
   result.fSize = alloc->size;
@@ -479,8 +484,8 @@ static inline GrVkAlloc AsGrVkAlloc(const gr_vk_alloc_t* alloc) {
   return result;
 }
 
-static inline GrVkBackendContext AsGrVkBackendContext(const gr_vk_backendcontext_t* context) {
-  GrVkBackendContext result;
+static inline skgpu::VulkanBackendContext AsGrVkBackendContext(const gr_vk_backendcontext_t* context) {
+  skgpu::VulkanBackendContext result;
   result.fInstance = AsVkInstance(context->instance);
   result.fPhysicalDevice = AsVkPhysicalDevice(context->physical_device);
   result.fDevice = AsVkDevice(context->device);

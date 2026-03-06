@@ -64,17 +64,17 @@ bool gr_directcontext_is_abandoned(gr_directcontext_t* self) {
 
 gr_directcontext_t* gr_directcontext_make_gl(const gr_gl_interface_t* gl_interface, const gr_contextoptions_t* options) {
   SK_ONLY_GL(GrContextOptions defaultOptions;)
-  return SK_ONLY_GL(ToGrDirectContext(GrDirectContext::MakeGL(sk_ref_sp(AsGrGLInterface(gl_interface)), (options) ? AsGrContextOptions(options) : defaultOptions).release()), nullptr);
+  return SK_ONLY_GL(ToGrDirectContext(GrDirectContexts::MakeGL(sk_ref_sp(AsGrGLInterface(gl_interface)), (options) ? AsGrContextOptions(options) : defaultOptions).release()), nullptr);
 }
 
 gr_directcontext_t* gr_directcontext_make_metal(const gr_mtl_backendcontext_t* backend_context, const gr_contextoptions_t* options) {
   SK_ONLY_METAL(GrContextOptions defaultOptions;)
-  return SK_ONLY_METAL(ToGrDirectContext(GrDirectContext::MakeMetal(AsGrMtlBackendContext(backend_context), (options) ? AsGrContextOptions(options) : defaultOptions).release()), nullptr);
+  return SK_ONLY_METAL(ToGrDirectContext(GrDirectContexts::MakeMetal(AsGrMtlBackendContext(backend_context), (options) ? AsGrContextOptions(options) : defaultOptions).release()), nullptr);
 }
 
 gr_directcontext_t* gr_directcontext_make_vulkan(const gr_vk_backendcontext_t* backend_context, const gr_contextoptions_t* options) {
   SK_ONLY_VULKAN(GrContextOptions defaultOptions;)
-  return SK_ONLY_VULKAN(ToGrDirectContext(GrDirectContext::MakeVulkan(AsGrVkBackendContext(backend_context), (options) ? AsGrContextOptions(options) : defaultOptions).release()), nullptr);
+  return SK_ONLY_VULKAN(ToGrDirectContext(GrDirectContexts::MakeVulkan(AsGrVkBackendContext(backend_context), (options) ? AsGrContextOptions(options) : defaultOptions).release()), nullptr);
 }
 
 void gr_directcontext_perform_deferred_cleanup(gr_directcontext_t* self, int64_t milliseconds) {

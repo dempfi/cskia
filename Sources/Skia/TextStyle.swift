@@ -1,4 +1,5 @@
 import CSkia
+import Darwin
 
 public class TextStyle {
   let handle: OpaquePointer

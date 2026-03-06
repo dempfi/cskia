@@ -1,5 +1,6 @@
 #include "include/sk_patheffect.h"
 
+#include "include/core/SkSpan.h"
 #include "sk_mapping.h"
 
 sk_patheffect_t* sk_patheffect_make_1dpath(const sk_path_t* path, float advance, float phase, sk_patheffect1dstyle_t style) {
@@ -23,7 +24,7 @@ sk_patheffect_t* sk_patheffect_make_corner(float radius) {
 }
 
 sk_patheffect_t* sk_patheffect_make_dash(const float intervals[], int32_t count, float phase) {
-  return ToPathEffect(SkDashPathEffect::Make(intervals, count, phase).release());
+  return ToPathEffect(SkDashPathEffect::Make(SkSpan<const SkScalar>(intervals, count), phase).release());
 }
 
 sk_patheffect_t* sk_patheffect_make_discrete(float seg_length, float deviation, uint32_t seed_assist) {

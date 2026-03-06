@@ -1,7 +1,31 @@
 #! /usr/bin/env python3
 
-import common, os, subprocess, sys, shutil
+import common, os, re, subprocess, sys, shutil
 from pathlib import Path
+
+def patch_sources():
+  """Apply patches to Skia source for SDK compatibility."""
+  skia_dir = Path(common.REPO_ROOT) / 'skia'
+
+  # Fix zlib fdopen macro conflict with modern macOS SDKs
+  zutil = skia_dir / 'third_party' / 'externals' / 'zlib' / 'zutil.h'
+  if zutil.exists():
+    text = zutil.read_text()
+    # Remove the problematic fdopen→NULL macro block for macOS
+    patched = re.sub(
+      r'#if defined\(MACOS\) \|\| defined\(TARGET_OS_MAC\)\n'
+      r'#  define OS_CODE  7\n'
+      r'#  ifndef Z_SOLO\n'
+      r'.*?#  endif\n'
+      r'#endif',
+      '#if defined(MACOS) || defined(TARGET_OS_MAC)\n'
+      '#  define OS_CODE  7\n'
+      '#endif',
+      text, flags=re.DOTALL
+    )
+    if patched != text:
+      zutil.write_text(patched)
+      print('> Patched zlib zutil.h (fdopen macro fix)')
 
 def embed_api():
   """Copy C API headers and sources into the Skia source tree and register them in the GN build."""
@@ -73,7 +97,6 @@ def main():
     'skia_use_system_libpng=false',
     'skia_use_system_libwebp=false',
     'skia_use_system_zlib=false',
-    'skia_use_sfntly=false',
 
     # Text layout
     'skia_enable_skparagraph=true',
@@ -83,7 +106,6 @@ def main():
     'skia_use_harfbuzz=true',
     'skia_pdf_subset_harfbuzz=true',
     'skia_use_system_harfbuzz=false',
-    'skia_use_system_freetype2=false',
   ]
 
   if 'macos' == target or isIos or isTvos:
@@ -161,6 +183,7 @@ def main():
     tools_dir = 'tools'
     ninja = 'ninja-linux-arm64'
 
+  patch_sources()
   embed_api()
 
   out = os.path.join('out', build_type + '-' + target + '-' + machine)

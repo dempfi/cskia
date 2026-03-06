@@ -57,7 +57,7 @@ void sk_canvas_draw_arc(sk_canvas_t* self, const sk_rect_t* oval, float start_an
 }
 
 void sk_canvas_draw_atlas(sk_canvas_t* self, const sk_image_t* atlas, const sk_rotationscalematrix_t transforms[], const sk_rect_t sprites[], const sk_color_t colors[], int32_t count, sk_blendmode_t blend_mode, const sk_samplingoptions_t* sampling, const sk_rect_t* cull_rect, const sk_paint_t* paint) {
-  AsCanvas(self)->drawAtlas(AsImage(atlas), AsRotationScaleMatrix(transforms), AsRect(sprites), colors, count, AsBlendMode(blend_mode), AsSamplingOptions(*sampling), AsRect(cull_rect), AsPaint(paint));
+  AsCanvas(self)->drawAtlas(AsImage(atlas), SkSpan<const SkRSXform>(AsRotationScaleMatrix(transforms), count), SkSpan<const SkRect>(AsRect(sprites), count), SkSpan<const SkColor>(colors, colors ? count : 0), AsBlendMode(blend_mode), AsSamplingOptions(*sampling), AsRect(cull_rect), AsPaint(paint));
 }
 
 void sk_canvas_draw_circle(sk_canvas_t* self, float x, float y, float radius, const sk_paint_t* paint) {
@@ -73,11 +73,11 @@ void sk_canvas_draw_color2(sk_canvas_t* self, const sk_color4f_t* color, sk_blen
 }
 
 void sk_canvas_draw_glyphs(sk_canvas_t* self, int32_t count, const sk_glyphid_t glyphs[], const sk_point_t positions[], const sk_point_t* origin, const sk_font_t* font, const sk_paint_t* paint) {
-  AsCanvas(self)->drawGlyphs(count, glyphs, AsPoint(positions), *AsPoint(origin), AsFont(*font), AsPaint(*paint));
+  AsCanvas(self)->drawGlyphs(SkSpan<const SkGlyphID>(glyphs, count), SkSpan<const SkPoint>(AsPoint(positions), count), *AsPoint(origin), AsFont(*font), AsPaint(*paint));
 }
 
 void sk_canvas_draw_glyphs2(sk_canvas_t* self, int32_t count, const sk_glyphid_t glyphs[], const sk_rotationscalematrix_t matrices[], const sk_point_t* origin, const sk_font_t* font, const sk_paint_t* paint) {
-  AsCanvas(self)->drawGlyphs(count, glyphs, AsRotationScaleMatrix(matrices), *AsPoint(origin), AsFont(*font), AsPaint(*paint));
+  AsCanvas(self)->drawGlyphsRSXform(SkSpan<const SkGlyphID>(glyphs, count), SkSpan<const SkRSXform>(AsRotationScaleMatrix(matrices), count), *AsPoint(origin), AsFont(*font), AsPaint(*paint));
 }
 
 void sk_canvas_draw_image(sk_canvas_t* self, const sk_image_t* image, float x, float y, const sk_samplingoptions_t* sampling, const sk_paint_t* paint) {
@@ -128,7 +128,7 @@ void sk_canvas_draw_point(sk_canvas_t* self, const sk_point_t* point, const sk_p
 }
 
 void sk_canvas_draw_points(sk_canvas_t* self, sk_drawpointsmode_t mode, size_t count, const sk_point_t points[], const sk_paint_t* paint) {
-  AsCanvas(self)->drawPoints(AsDrawPointsMode(mode), count, AsPoint(points), AsPaint(*paint));
+  AsCanvas(self)->drawPoints(AsDrawPointsMode(mode), SkSpan<const SkPoint>(AsPoint(points), count), AsPaint(*paint));
 }
 
 void sk_canvas_draw_rect(sk_canvas_t* self, const sk_rect_t* rect, const sk_paint_t* paint) {
