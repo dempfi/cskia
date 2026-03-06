@@ -20,11 +20,11 @@ let package = Package(
     .tvOS(.v15),
   ],
   products: [
-    .library(name: "cskia", targets: ["CSkia"]),
+    .library(name: "cskia", targets: ["cskia"]),
   ],
   targets: [
     .target(
-      name: "CSkia",
+      name: "cskia",
       dependencies: ["SkiaBinary", "SkParagraphBinary", "SkShaperBinary", "SkUnicodeBinary"],
       cSettings: [
         .headerSearchPath("include"),

@@ -1,4 +1,4 @@
-module CSkia [system] {
+module cskia [system] {
   umbrella header "umbrella.h"
   link "skia"
   link "skparagraph"
