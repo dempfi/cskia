@@ -1,9 +1,5 @@
 module cskia [system] {
   umbrella header "umbrella.h"
-  link "skia"
-  link "skparagraph"
-  link "skshaper"
-  link "skunicode"
   link "c++"
   export *
 }
