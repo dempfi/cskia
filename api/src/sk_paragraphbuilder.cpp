@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "sk_default_fontmgr.h"
 #include "sk_paragraph_mapping.h"
 #include "modules/skunicode/include/SkUnicode.h"
 
@@ -13,16 +14,6 @@
 #include "modules/skunicode/include/SkUnicode_libgrapheme.h"
 #endif
 
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
-#include "include/ports/SkFontMgr_mac_ct.h"
-#elif defined(SK_BUILD_FOR_ANDROID)
-#include "include/ports/SkFontMgr_android.h"
-#elif defined(SK_FONTMGR_FONTCONFIG_AVAILABLE)
-#include "include/ports/SkFontMgr_fontconfig.h"
-#else
-#include "include/ports/SkFontMgr_empty.h"
-#endif
-
 static sk_sp<SkUnicode> sk_get_unicode() {
 #if defined(SK_UNICODE_ICU_IMPLEMENTATION)
   return SkUnicodes::ICU::Make();
@@ -32,18 +23,6 @@ static sk_sp<SkUnicode> sk_get_unicode() {
   return SkUnicodes::Libgrapheme::Make();
 #else
   return nullptr;
-#endif
-}
-
-static sk_sp<SkFontMgr> sk_get_default_fontmgr() {
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
-  return SkFontMgr_New_CoreText(nullptr);
-#elif defined(SK_BUILD_FOR_ANDROID)
-  return SkFontMgr_New_Android(nullptr, nullptr);
-#elif defined(SK_FONTMGR_FONTCONFIG_AVAILABLE)
-  return SkFontMgr_New_FontConfig(nullptr, nullptr);
-#else
-  return SkFontMgr_New_Custom_Empty();
 #endif
 }
 

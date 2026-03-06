@@ -1,28 +1,7 @@
 #include "include/sk_fontmgr.h"
 
+#include "sk_default_fontmgr.h"
 #include "sk_mapping.h"
-
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
-#include "include/ports/SkFontMgr_mac_ct.h"
-#elif defined(SK_BUILD_FOR_ANDROID)
-#include "include/ports/SkFontMgr_android.h"
-#elif defined(SK_FONTMGR_FONTCONFIG_AVAILABLE)
-#include "include/ports/SkFontMgr_fontconfig.h"
-#else
-#include "include/ports/SkFontMgr_empty.h"
-#endif
-
-static sk_sp<SkFontMgr> sk_get_default_fontmgr() {
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
-  return SkFontMgr_New_CoreText(nullptr);
-#elif defined(SK_BUILD_FOR_ANDROID)
-  return SkFontMgr_New_Android(nullptr, nullptr);
-#elif defined(SK_FONTMGR_FONTCONFIG_AVAILABLE)
-  return SkFontMgr_New_FontConfig(nullptr, nullptr);
-#else
-  return SkFontMgr_New_Custom_Empty();
-#endif
-}
 
 sk_fontmgr_t* sk_fontmgr_create_default(void) {
   return ToFontMgr(sk_get_default_fontmgr().release());

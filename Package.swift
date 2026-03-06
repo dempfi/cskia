@@ -2,12 +2,12 @@
 
 import PackageDescription
 
-let version = "m145-fba326b-1"
+let version = "m145-fba326b-2"
 let checksums: [String: String] = [
-  "skia": "0ae06d52f346c6f8e9bf4e07a42d2a93821d68880020c1aa30506440bc166df6",
-  "skparagraph": "ffe56e8f1799fb3da7cce27ad8f575206af87ea01e2d5d9369d1a61c2be0a1fc",
-  "skshaper": "efbabbd35a7ce2f45f5c62749bfa68c6076b8491e13a938c91b225edc08df0b7",
-  "skunicode": "ce158f03588ade82a8a34094fd5bcdee1e203014ab3c08882a64011c53d91ab5",
+  "skia": "95b43948d3bc2bce45d6f3d94a6dedb3b922a522a4754421ccbfce6b35e627c1",
+  "skparagraph": "87162d599bd2fe963af386845ce822ef8a4d825a77d1e9b0a9080fd90f1dbe56",
+  "skshaper": "4801b4034bf45d12d5837c5bfd7a21d7dfffbae7520f2b9ce603d4ccfdb1594f",
+  "skunicode": "7933bba7b3bdbcf4cdd683c07faae45b1f19f8dee8709eb829063be63a39d923",
 ]
 
 let repo = "https://github.com/dempfi/cskia"
